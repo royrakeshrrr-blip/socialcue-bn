@@ -179,3 +179,25 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# API keys and credentials
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Private or identifiable annotation information
+data/private/
+annotations/identifiable/
+
+# Temporary files
+*.tmp
+*.log
+Thumbs.db
+.DS_Store
