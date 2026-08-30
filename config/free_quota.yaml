@@ -1,0 +1,22 @@
+policy:
+  access_mode: "FREE_ONLY"
+  hard_budget_usd: 0.0
+  paid_fallback_allowed: false
+  reserve_fraction: 0.25
+  dry_run_instances: 10
+
+# Leave this list empty during Phase 2.
+# Later, add one officially verified entry for each model.
+free_models: []
+
+# Future entry format:
+#
+# free_models:
+#   - model_id: "M1"
+#     provider: "PROVIDER_NAME"
+#     model_name: "EXACT_MODEL_NAME"
+#     verification_date: "YYYY-MM-DD"
+#     evidence_file: "docs/model_selection/quota_evidence/M1.md"
+#     requests_per_minute: 0
+#     requests_per_day: 0
+#     authorization_status: "APPROVED"
