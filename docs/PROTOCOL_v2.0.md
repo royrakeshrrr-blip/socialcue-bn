@@ -279,3 +279,323 @@ A message family is structurally valid only when:
 
 If any of these conditions fail, the family must be corrected or excluded
 before annotation.
+
+## 3. Context Variables and Allowed Values
+
+### 3.1 General rule
+
+Every dataset instance must use the exact field names and allowed categorical
+values defined in this section.
+
+Different spellings or alternative descriptions must not be used for fields
+that will be analyzed statistically.
+
+For example, the authority value must be recorded as `HIGHER`, not as:
+
+- High
+- Senior
+- Boss
+- More powerful
+- Higher authority person
+
+The four controlled social cues are:
+
+1. Authority relation
+2. Relative age
+3. Familiarity
+4. Setting
+
+All four social cues must have valid values in every dataset instance.
+Blank and unknown values are not allowed for the primary benchmark.
+
+If a cue cannot be determined from the scenario, the instance must be
+rewritten or excluded.
+
+### 3.2 Identification fields
+
+| Field | Type | Allowed values or format | Purpose |
+|---|---|---|---|
+| `message_family_id` | Text ID | F001 to F150 | Identifies the message family |
+| `instance_id` | Text ID | F001-A, F001-B, F001-C, etc. | Identifies one instance |
+| `variant` | Category | A, B, C | Identifies the context variant |
+| `romanized_message` | Text | Romanized Bangla message | Message shown to models |
+| `changed_cue_from_A` | Category | NONE, AUTHORITY, AGE, FAMILIARITY, SETTING | Records the cue changed from A |
+
+Variant A must always use:
+
+`changed_cue_from_A = NONE`
+
+Variant B and Variant C must each use one of:
+
+- AUTHORITY
+- AGE
+- FAMILIARITY
+- SETTING
+
+Variant B and Variant C must change different cues from Variant A.
+
+### 3.3 Authority relation
+
+Field name:
+
+`authority_relation`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `LOWER` | Recipient has lower authority than the speaker |
+| `EQUAL` | Recipient and speaker have approximately equal authority |
+| `HIGHER` | Recipient has higher authority than the speaker |
+
+Authority is always recorded from the recipient's position relative to the
+speaker.
+
+Example:
+
+- A student speaking to a teacher: `HIGHER`
+- A teacher speaking to a student: `LOWER`
+- One classmate speaking to another classmate: `EQUAL`
+
+Authority does not automatically determine the final Tui, Tumi or Apni label.
+Human annotators will consider all available social information.
+
+### 3.4 Relative age
+
+Field name:
+
+`relative_age`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `YOUNGER` | Recipient is meaningfully younger than the speaker |
+| `SIMILAR` | Recipient and speaker are approximately similar in age |
+| `OLDER` | Recipient is meaningfully older than the speaker |
+
+Age is always recorded from the recipient's position relative to the speaker.
+
+Example:
+
+- A 20-year-old speaking to a 45-year-old: `OLDER`
+- A 45-year-old speaking to a 20-year-old: `YOUNGER`
+- Two university classmates of similar age: `SIMILAR`
+
+Exact numerical ages do not need to be included unless they are necessary
+to understand the scenario.
+
+### 3.5 Familiarity
+
+Field name:
+
+`familiarity`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `LOW` | Stranger, first meeting or very limited personal familiarity |
+| `MEDIUM` | Acquaintance, regular contact or moderately familiar relationship |
+| `HIGH` | Close friend, close relative or strongly familiar relationship |
+
+Familiarity describes the personal relationship between the speaker and the
+recipient.
+
+Examples:
+
+- Speaking to an unknown shopkeeper: `LOW`
+- Speaking to a regularly contacted classmate: `MEDIUM`
+- Speaking to a very close childhood friend: `HIGH`
+
+Familiarity must not be determined only from the amount of time two people
+have known each other. The closeness of the relationship must also be
+considered.
+
+### 3.6 Setting
+
+Field name:
+
+`setting`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `INFORMAL` | Casual, personal or relaxed communication |
+| `SEMI_FORMAL` | Moderately structured communication without strict formality |
+| `FORMAL` | Official, professional, institutional or ceremonially respectful communication |
+
+Examples:
+
+- Casual conversation at home: `INFORMAL`
+- Ordinary class-group communication: `SEMI_FORMAL`
+- Formal communication with a department head: `FORMAL`
+
+Setting describes the communication situation. It does not describe the
+physical location alone.
+
+For example, communication inside an office is not automatically `FORMAL`.
+Two close colleagues may communicate informally while physically present
+in an office.
+
+### 3.7 Domain
+
+Field name:
+
+`domain`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `ACADEMIC` | University, school, teaching, supervision or coursework |
+| `PROFESSIONAL` | Workplace, employment, office or organizational communication |
+| `FAMILY` | Communication between family members or relatives |
+| `FRIENDSHIP` | Communication between friends or socially close peers |
+| `SERVICE_PUBLIC` | Shops, transportation, healthcare, customer service or public offices |
+| `ONLINE_COMMUNITY` | Online groups, forums, social communities or moderated spaces |
+
+Domain is used to measure dataset coverage. It is not one of the four
+controlled social cues.
+
+All three instances in one message family must use the same domain.
+
+### 3.8 Communicative intention
+
+Field name:
+
+`intent`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `REQUEST` | Asking someone to do something |
+| `QUESTION` | Requesting information |
+| `REMINDER` | Reminding someone about a task or event |
+| `APOLOGY` | Expressing regret |
+| `INVITATION` | Inviting someone to an event or activity |
+| `FOLLOW_UP` | Checking the status of earlier communication |
+| `INFORMATION` | Providing information |
+| `FEEDBACK` | Giving or requesting feedback |
+| `CONFIRMATION` | Confirming a plan, decision or event |
+| `OTHER_DOCUMENTED` | A justified intention not covered by the main categories |
+
+If `OTHER_DOCUMENTED` is used, a short explanation must be recorded.
+
+All three instances in one message family must have the same communicative
+intention.
+
+### 3.9 Speaker and recipient roles
+
+Field names:
+
+- `speaker_role`
+- `recipient_role`
+
+Recommended role values include:
+
+- STUDENT
+- TEACHER
+- SUPERVISOR
+- COLLEAGUE
+- EMPLOYEE
+- MANAGER
+- FRIEND
+- SIBLING
+- PARENT
+- RELATIVE
+- CUSTOMER
+- SERVICE_WORKER
+- DRIVER
+- SHOPKEEPER
+- DOCTOR
+- PATIENT
+- OFFICIAL
+- MODERATOR
+- COMMUNITY_MEMBER
+- OTHER_DOCUMENTED
+
+If `OTHER_DOCUMENTED` is used, the role must be explained in a separate note.
+
+Speaker and recipient roles provide context but are not treated as separate
+experimental social cues.
+
+The roles should normally remain unchanged across A, B and C. If changing a
+role also changes authority, age, familiarity or setting, the family must be
+reviewed carefully to ensure that only the designated experimental cue has
+changed.
+
+### 3.10 Source register
+
+Field name:
+
+`source_register`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `TUI` | Original message already contains clear Tui-form language |
+| `TUMI` | Original message already contains clear Tumi-form language |
+| `APNI` | Original message already contains clear Apni-form language |
+| `MIXED` | Original message contains more than one register form |
+| `UNCLEAR` | Original message does not clearly reveal a register |
+
+`source_register` describes the language already present in the Romanized
+message. It is not the final human gold label.
+
+The field will later help measure whether a model genuinely uses social
+context or simply copies the register already present in the message.
+
+Because the Romanized message is identical within a family, `source_register`
+must also remain identical across A, B and C.
+
+### 3.11 Fields that must remain unchanged within a family
+
+The following fields must remain unchanged across A, B and C:
+
+- `message_family_id`
+- `romanized_message`
+- `domain`
+- `intent`
+- `source_register`
+- Normally `speaker_role`
+- Normally `recipient_role`
+
+For each controlled comparison, all non-target social cues must also remain
+unchanged.
+
+Only the cue named in `changed_cue_from_A` may differ from Variant A.
+
+### 3.12 Invalid field examples
+
+The following entries are invalid:
+
+| Field | Invalid entry | Correct form |
+|---|---|---|
+| `authority_relation` | Boss | HIGHER |
+| `authority_relation` | Same level | EQUAL |
+| `relative_age` | 45 years | OLDER, YOUNGER or SIMILAR |
+| `familiarity` | Known for two years | LOW, MEDIUM or HIGH |
+| `setting` | Office | INFORMAL, SEMI_FORMAL or FORMAL |
+| `domain` | University teacher | ACADEMIC |
+| `changed_cue_from_A` | Authority changed | AUTHORITY |
+
+The descriptive details may appear in contextual notes, but the analytical
+fields must use the approved categorical values.
+
+### 3.13 Context-variable validation rules
+
+An instance passes context-variable validation only when:
+
+- Every required field exists.
+- No required value is blank.
+- Every categorical value belongs to the approved list.
+- Authority and age are recorded from the recipient's position.
+- Domain and intent remain unchanged within a family.
+- Source register remains unchanged within a family.
+- Variant A uses `changed_cue_from_A = NONE`.
+- Variants B and C record valid and different changed cues.
+- Each controlled comparison changes exactly one social cue.
