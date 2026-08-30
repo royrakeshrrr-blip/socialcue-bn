@@ -3405,3 +3405,365 @@ Core metrics are frozen only when:
 
 After metric freeze, any additional metric must be labelled secondary or
 exploratory unless added through an approved protocol amendment.
+
+## 10. Statistical Analysis and Interpretation Plan
+
+### 10.1 Purpose
+
+This section freezes the statistical analysis plan before the core test-set results are generated or inspected. Its purpose is to prevent the analysis method from being changed after observing which method produces the most favorable result.
+
+Development-set results may be used for debugging the experiment runner, parser, prompts, and evaluation scripts. Development-set results must not be presented as final evidence.
+
+All final core conclusions must be based on the frozen test split containing:
+
+* 120 message families;
+* 360 individual contextualized instances;
+* 240 controlled counterfactual pairs;
+* three API-based language models;
+* three prompt conditions: P0, P1, and P2.
+
+The BanglaMate agent extension is not included in this statistical plan. Its analysis will be frozen separately after the core results have been frozen.
+
+### 10.2 Units of Analysis
+
+The thesis contains three related units of analysis.
+
+#### 10.2.1 Instance-Level Unit
+
+An instance is one message presented under one social context.
+
+Instance-level metrics use the 360 frozen test instances.
+
+The main instance-level outcomes are:
+
+* primary-label accuracy;
+* acceptable-set accuracy;
+* macro-F1;
+* class-specific precision, recall, and F1;
+* over-politeness rate;
+* under-politeness rate;
+* source-copy rate;
+* invalid-output rate.
+
+#### 10.2.2 Counterfactual-Pair Unit
+
+A controlled counterfactual pair consists of two instances from the same family where exactly one planned social cue differs.
+
+Each test family contains two valid controlled comparisons:
+
+* A versus B;
+* A versus C.
+
+Therefore, the test set contains 240 controlled counterfactual pairs.
+
+The main pair-level outcome is strict counterfactual consistency.
+
+#### 10.2.3 Family-Level Statistical Unit
+
+The 120 message families are treated as the independent statistical clusters.
+
+The three instances belonging to the same family are related and must not be treated as three completely independent observations. Similarly, the two counterfactual pairs belonging to the same family are related.
+
+Consequently, confidence intervals, resampling, and paired statistical tests must operate at the family level. Whenever a family is selected during resampling, all three instances and both controlled pairs belonging to that family must be selected together.
+
+### 10.3 Descriptive Reporting
+
+Before performing statistical comparisons, the following information must be reported for every model and prompt condition:
+
+* number of expected outputs;
+* number of successfully parsed outputs;
+* number of invalid outputs;
+* number of unresolved missing outputs;
+* numerator and denominator for every reported metric;
+* metric value;
+* 95% confidence interval, where applicable.
+
+Raw counts must be presented together with percentages. A percentage must never be reported without its denominator.
+
+Development and test results must be stored and reported separately.
+
+### 10.4 Primary Confirmatory Comparisons
+
+The primary statistical question is whether the structured-context condition P2 performs better than the message-only condition P0 on the same frozen test cases.
+
+The following six comparisons are the confirmatory comparisons:
+
+1. P2 versus P0 acceptable-set accuracy for Model 1.
+2. P2 versus P0 acceptable-set accuracy for Model 2.
+3. P2 versus P0 acceptable-set accuracy for Model 3.
+4. P2 versus P0 strict counterfactual consistency for Model 1.
+5. P2 versus P0 strict counterfactual consistency for Model 2.
+6. P2 versus P0 strict counterfactual consistency for Model 3.
+
+These comparisons are paired because P0 and P2 are evaluated using exactly the same test instances and families.
+
+The P2-versus-P0 comparison evaluates the complete structured-context condition against the message-only condition. It does not prove that formatting alone caused a difference because P2 differs from P0 in both the presence and representation of social-context information.
+
+### 10.5 Secondary and Exploratory Comparisons
+
+The following comparisons are secondary or exploratory:
+
+* P1 versus P0;
+* P2 versus P1;
+* comparisons between different models;
+* primary-label accuracy differences;
+* macro-F1 differences;
+* per-register performance;
+* per-cue performance;
+* per-domain performance;
+* over-politeness and under-politeness differences;
+* source-copy-rate differences;
+* confidence-score analysis.
+
+P1 versus P0 helps examine the value of adding social context in narrative form.
+
+P2 versus P1 helps examine whether structured presentation performs differently from narrative presentation when both prompts contain social context.
+
+These comparisons must be clearly labelled as secondary or exploratory. They must not be presented as confirmatory findings unless the protocol is formally amended before test-set evaluation.
+
+### 10.6 Effect Sizes
+
+For accuracy and consistency metrics, the main effect size is the paired percentage-point difference:
+
+Δ = Score(P2) − Score(P0)
+
+For example, if P0 acceptable-set accuracy is 70% and P2 acceptable-set accuracy is 76%, the effect size is:
+
+Δ = 76% − 70% = +6 percentage points
+
+Positive values favor P2. Negative values favor P0.
+
+Every comparison must report:
+
+* score under each condition;
+* absolute percentage-point difference;
+* 95% confidence interval for the difference;
+* raw and adjusted p-values for the six confirmatory tests.
+
+A statistically significant result must not automatically be described as practically important. The magnitude and confidence interval must also be considered.
+
+### 10.7 Family-Clustered Bootstrap Confidence Intervals
+
+Confidence intervals will be calculated using a non-parametric family-clustered bootstrap.
+
+The procedure is:
+
+1. Start with the 120 frozen test-family IDs.
+2. Randomly sample 120 family IDs with replacement.
+3. Include all three instances and both controlled pairs from every sampled family.
+4. Calculate the required metric on the resampled data.
+5. Repeat this process 10,000 times.
+6. Use the 2.5th and 97.5th percentiles of the bootstrap distribution as the 95% confidence interval.
+
+The master random seed will be:
+
+`20260830`
+
+For paired condition differences, the same resampled families must be used for both conditions during each bootstrap repetition. P0 and P2 must never be bootstrapped independently.
+
+The bootstrap procedure will be used for:
+
+* acceptable-set accuracy;
+* primary-label accuracy;
+* macro-F1;
+* strict counterfactual consistency;
+* differences between prompt conditions;
+* selected error-rate differences.
+
+For macro-F1, the label list must always remain fixed as:
+
+* TUI;
+* TUMI;
+* APNI.
+
+If a bootstrap sample contains no examples of a particular class, that class must not be silently removed from the macro-F1 calculation. Its score must be handled using the frozen evaluation implementation with `zero_division=0`.
+
+### 10.8 Paired Family-Level Randomization Tests
+
+The six confirmatory comparisons will use paired family-level randomization tests.
+
+For acceptable-set accuracy:
+
+1. Calculate P0 correctness for every individual instance.
+2. Calculate P2 correctness for the same instance.
+3. For each family, calculate the mean P0 correctness across its three instances.
+4. For the same family, calculate the mean P2 correctness across its three instances.
+5. Calculate the within-family difference.
+6. Randomly reverse the sign of each family difference.
+7. Calculate the mean randomized difference across all families.
+8. Repeat the randomization 10,000 times.
+9. Calculate a two-sided p-value by comparing the observed difference with the randomized differences.
+
+For strict counterfactual consistency, the same procedure will be followed, but each family score will be calculated from its two controlled counterfactual pairs.
+
+The master random seed will be `20260830`. Each test will use a reproducible seed derived from the master seed and its fixed test number.
+
+All confirmatory tests will be two-sided, even though the expected direction is that P2 may outperform P0.
+
+Independent-sample t-tests and ordinary chi-square tests must not be used for these paired comparisons because the prompt conditions are evaluated on the same families.
+
+An ordinary instance-level McNemar test may be reported only as a supplementary analysis if requested by the supervisor. It must not replace the family-level primary analysis because instances from the same message family are related.
+
+### 10.9 Multiple-Comparison Correction
+
+The six confirmatory p-values defined in Section 10.4 will be corrected together using the Holm–Bonferroni procedure.
+
+The statistical significance level will be:
+
+`α = 0.05`
+
+For each confirmatory comparison, the thesis must report:
+
+* unadjusted p-value;
+* Holm-adjusted p-value;
+* effect size;
+* 95% confidence interval.
+
+A confirmatory result will be described as statistically significant only if its Holm-adjusted p-value is below 0.05.
+
+Secondary or exploratory tests must be placed in separately declared comparison families. If several exploratory p-values are calculated together, Holm correction must be applied within that family. Exploratory findings must remain labelled exploratory regardless of their p-values.
+
+### 10.10 Annotation-Agreement Analysis
+
+Annotation agreement will be evaluated separately for:
+
+* the 45-instance pilot set annotated by both annotators;
+* the frozen 150-instance overlap set annotated by both annotators.
+
+The following agreement measures will be reported:
+
+* raw percentage agreement for `primary_register`;
+* Cohen’s kappa for `primary_register`;
+* exact acceptable-set agreement;
+* disagreement counts by register combination;
+* disagreement counts by reason code;
+* number and proportion of cases requiring adjudication.
+
+Before the main annotation begins, a subset of clearly interpretable pilot control items should be identified. A Cohen’s kappa of at least 0.60 on these clear-control items will be treated as a training-readiness target.
+
+If this target is not reached, the annotation instructions must be clarified and the pilot discussion repeated before main annotation begins.
+
+This threshold applies only to preidentified clear-control items. It must not be used to delete culturally ambiguous cases or to hide genuine disagreement.
+
+Overall kappa must be interpreted together with raw agreement and label prevalence. Low agreement on genuinely ambiguous cases is itself a research finding and must be reported rather than concealed.
+
+### 10.11 Invalid and Missing Model Outputs
+
+Invalid outputs must remain in the evaluation denominator and must be counted as incorrect.
+
+Examples include:
+
+* an output that cannot be parsed;
+* a label outside TUI, TUMI, and APNI;
+* an empty response;
+* a refusal;
+* malformed JSON that remains invalid after the permitted deterministic repair;
+* an unresolved API failure after the frozen retry procedure.
+
+No failed output may be silently deleted to improve a model’s score.
+
+The following must be reported separately:
+
+* API request failures;
+* successful retries;
+* unresolved failures;
+* parsing failures;
+* model refusals;
+* other invalid responses.
+
+Human gold labels must not be imputed automatically. Any missing required annotation must be resolved before `DATASET_FROZEN` is created.
+
+### 10.12 Subgroup Analysis
+
+Exploratory subgroup results may be reported for:
+
+* changed social cue;
+* authority relation;
+* relative age;
+* familiarity;
+* setting;
+* domain;
+* gold register;
+* source register.
+
+Every subgroup table must include its sample size.
+
+Subgroups with very small sample sizes must be interpreted cautiously. No broad conclusion may be made from a subgroup containing only a few families.
+
+Subgroup analysis must not be used to search repeatedly for a favorable result. All tested subgroups must be reported, including those that show no difference.
+
+### 10.13 Interpretation Rules
+
+The following interpretation rules are frozen:
+
+1. A non-significant result does not prove that two conditions are identical.
+2. A statistically significant result does not automatically mean that the improvement is useful or large.
+3. Confidence-interval width must be considered when discussing uncertainty.
+4. Negative or mixed findings remain valid thesis results.
+5. Results apply to the selected models, prompts, dataset, and evaluation procedure.
+6. Results must not be generalized to every LLM or every Romanized Bangla conversation.
+7. Better P2 performance may be described as evidence that the tested structured-context prompt helped under the experimental conditions.
+8. Better P2 performance must not be described as proof that the model genuinely understood society, culture, politeness, or human reasoning.
+9. A model’s self-reported confidence must not be treated as a true probability unless calibration evidence supports that interpretation.
+10. Correlation between a social cue and a prediction must not automatically be described as causal.
+11. Claims about controlled counterfactual effects must remain limited to the cue changes intentionally created in the dataset.
+
+### 10.14 Planned Analysis Outputs
+
+The analysis pipeline will generate the following files:
+
+* `results/processed/core_instance_scores.csv`
+* `results/processed/core_pair_scores.csv`
+* `results/processed/core_error_analysis.csv`
+* `analysis/bootstrap_core.csv`
+* `analysis/paired_randomization_core.csv`
+* `analysis/annotation_agreement.csv`
+* `analysis/core_summary_tables.md`
+* `figures/core_confusion_matrices/`
+* `figures/core_prompt_comparisons/`
+* `figures/core_cue_analysis/`
+
+These files will be generated by scripts. Final metric values must not be calculated or manually altered in a spreadsheet.
+
+Any manually written interpretation table must be traceable to a generated analysis file.
+
+### 10.15 Reproducibility Requirements
+
+The statistical-analysis scripts must record:
+
+* random seed;
+* number of bootstrap repetitions;
+* number of randomization repetitions;
+* Python version;
+* relevant package versions;
+* input-file hash or frozen dataset version;
+* model and prompt identifiers;
+* date and time of analysis;
+* Git commit used for the analysis.
+
+Running the same script on the same frozen inputs must reproduce the same results, except for insignificant formatting differences.
+
+### 10.16 Statistical Plan Freeze Conditions
+
+This section can be considered frozen only when:
+
+* the supervisor has reviewed the primary comparisons;
+* the supervisor accepts the family-level analysis unit;
+* the supervisor accepts the confidence-interval procedure;
+* the supervisor accepts the multiple-comparison correction;
+* the confirmatory and exploratory analyses are clearly separated;
+* no core test-set results have been examined;
+* the protocol changes have been committed and pushed.
+
+After approval, create the milestone tag:
+
+`STATISTICAL_PLAN_FROZEN`
+
+Any later change must be documented in the change log with:
+
+* old rule;
+* new rule;
+* reason for the change;
+* date;
+* whether test results had already been viewed;
+* effect on interpretation.
