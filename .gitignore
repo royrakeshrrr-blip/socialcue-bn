@@ -195,6 +195,7 @@ __pycache__/
 # Private or identifiable annotation information
 data/private/
 annotations/identifiable/
+data/annotations/identifiable/
 
 # Temporary files
 *.tmp
