@@ -1198,3 +1198,491 @@ An instance may enter the final benchmark only when:
 - Required revisions are documented.
 - Required reannotation is complete.
 - Its final review action is `KEEP`.
+
+## 6. Human Annotation Design
+
+### 6.1 Annotation design summary
+
+The benchmark will use two native Bangla annotators.
+
+The annotation design is:
+
+| Activity | Annotator A | Annotator B |
+|---|---:|---:|
+| Qualification controls | 12 | 12 |
+| Pilot annotation | 45 instances | 45 instances |
+| Final benchmark annotation | All 450 instances | Frozen 150-instance subset |
+| Additional flagged cases | When required | When required |
+| Extension-output rating | Defined separately | Defined separately |
+
+Annotator B's primary reliability subset will contain 50 complete message
+families:
+
+50 families × 3 instances = 150 instances.
+
+This design reduces annotation workload while preserving an independently
+annotated subset for agreement analysis.
+
+It is less rigorous than having both annotators label all 450 instances.
+This limitation must be disclosed in the thesis and approved by the
+supervisor.
+
+### 6.2 Annotator eligibility
+
+An annotator should:
+
+- Be an adult native or highly proficient Bangla speaker.
+- Understand ordinary Bangladeshi social relationships.
+- Be comfortable reading Romanized Bangla.
+- Understand the difference between Tui, Tumi and Apni.
+- Be able to work independently.
+- Provide informed consent.
+- Agree not to share the dataset before its release.
+- Have no financial or personal interest in producing a particular result.
+
+An annotator does not need to be:
+
+- A machine-learning expert.
+- A programmer.
+- A linguistics researcher.
+- Familiar with the evaluated language models.
+
+An AI system cannot serve as an official human annotator.
+
+### 6.3 Researcher participation
+
+Whenever possible, the two annotators should not be the same person who
+created most of the dataset.
+
+If the researcher must act as Annotator A because of limited resources:
+
+- This must be approved by the supervisor.
+- The researcher role must be disclosed in the thesis.
+- Annotator B must remain independent.
+- The frozen 150-instance subset must be selected before Annotator B sees it.
+- Annotator B must not see the researcher's labels.
+- Disagreements must be recorded transparently.
+- Stronger independent review should be used for low-confidence cases.
+
+The researcher must not change an instance merely because Annotator B
+disagrees with the researcher's expected label.
+
+### 6.4 Annotator identifiers
+
+Real names will not appear in the research dataset.
+
+Use:
+
+- `ANN_A`
+- `ANN_B`
+- `ADJUDICATOR`
+
+A separate private consent record may connect these codes to real identities.
+
+The identity file must be stored outside the shareable dataset in:
+
+`data/private/`
+
+The private identity file must not be pushed to GitHub because the
+`data/private/` directory is excluded by `.gitignore`.
+
+### 6.5 Annotator information and consent
+
+Before annotation, each annotator must receive a short information sheet
+explaining:
+
+- The purpose of the research.
+- What they will be asked to do.
+- Approximate time required.
+- That participation is voluntary.
+- Whether compensation will be provided.
+- How their identity will be protected.
+- That they may stop participating.
+- That the messages are synthetic, fictional or safely documented.
+- How their anonymized annotations may be used in the thesis.
+
+Consent must be collected before qualification or annotation begins.
+
+The consent procedure must follow university and supervisor requirements.
+
+### 6.6 Qualification controls
+
+Each annotator must independently complete 12 clear qualification items.
+
+Qualification items must:
+
+- Be separate from the pilot and final dataset.
+- Never appear in development or test data.
+- Contain enough context for a clear decision.
+- Include examples of Tui, Tumi and Apni.
+- Include examples from more than one domain.
+- Have reference answers established before annotator recruitment.
+- Test whether the annotator understands primary and secondary labels.
+- Test whether the annotator can identify missing or contradictory context.
+
+Passing requirement:
+
+- At least 10 correct primary labels out of 12.
+- No systematic confusion between one label pair.
+- Correct understanding of the annotation instructions.
+
+If an annotator fails:
+
+1. Explain the misunderstood rules.
+2. Provide separate practice examples.
+3. Do not reveal answers to future qualification items.
+4. Give one new qualification attempt using different examples.
+5. Replace the annotator if the second attempt also fails.
+
+Qualification responses must not be included in benchmark agreement
+statistics.
+
+### 6.7 Pilot annotation
+
+The pilot will contain:
+
+15 message families × 3 instances = 45 instances.
+
+Both Annotator A and Annotator B will independently annotate all 45 pilot
+instances.
+
+Pilot procedure:
+
+1. Give both annotators the same frozen pilot file.
+2. Give both annotators the same annotation-guide version.
+3. Randomize item order separately for each annotator.
+4. Do not show family adjacency when practical.
+5. Do not show one annotator's answers to the other.
+6. Do not show model predictions.
+7. Do not show researcher-expected labels.
+8. Allow questions about the procedure, but do not coach individual answers.
+9. Save each annotator's raw responses separately.
+10. Validate that every required annotation field is present.
+11. Calculate agreement before adjudication.
+12. Categorize disagreements.
+13. Revise the annotation guide when necessary.
+14. Run another small pilot if serious misunderstanding remains.
+
+Pilot annotations are used to improve the annotation guide. They do not
+automatically become final gold annotations.
+
+If a pilot family is later included in the full benchmark, it must pass all
+final validation rules and be annotated under the frozen final annotation
+guide.
+
+### 6.8 Annotator A full-dataset assignment
+
+Annotator A will independently annotate all:
+
+150 families × 3 instances = 450 instances.
+
+Annotator A must:
+
+- Use the frozen annotation guide.
+- Receive instances in randomized order.
+- Annotate without seeing model outputs.
+- Annotate without seeing dataset-designer predictions.
+- Complete all required fields.
+- Work in several manageable sessions.
+- Save progress after every session.
+- Avoid discussing individual answers with Annotator B.
+- Mark uncertain or problematic cases rather than guessing.
+
+Recommended session size:
+
+- Approximately 50–75 instances per session.
+- Take a break between sessions.
+- Avoid completing all 450 instances in one sitting.
+
+### 6.9 Annotator B frozen subset
+
+Annotator B will independently annotate 50 complete message families:
+
+50 families × 3 instances = 150 instances.
+
+The subset-selection process must:
+
+1. Start from the structurally valid full dataset.
+2. Select complete families, not individual rows.
+3. Use a recorded random seed.
+4. Include every domain.
+5. Represent all four changed-cue types.
+6. Avoid selecting according to model results.
+7. Avoid selecting only easy or obvious cases.
+8. Occur before Annotator B sees any full-dataset labels.
+9. Produce a saved list of selected family IDs.
+10. Produce a checksum or frozen version identifier.
+
+The selected IDs will later be saved in a file such as:
+
+`data/annotations/annotator_b_family_ids.txt`
+
+The file will contain 50 family IDs, for example:
+
+```text
+F003
+F009
+F012
+F017
+...
+```
+
+The actual family IDs will be generated later after the full dataset exists.
+They are not selected during Phase 1.
+
+### 6.10 Stratification of Annotator B's subset
+
+Annotator B's subset should be approximately balanced across the six domains.
+
+A suitable target is:
+
+| Domain | Approximate families |
+|---|---:|
+| Academic | 8–10 |
+| Professional | 7–9 |
+| Family | 7–9 |
+| Friendship | 7–9 |
+| Service/Public | 7–9 |
+| Online Community | 7–9 |
+| Total | 50 |
+
+The exact allocation may follow the final dataset distribution.
+
+The selection report must state:
+
+- Random seed.
+- Number of families from each domain.
+- Number of comparisons for each cue type.
+- Number of instances.
+- Date of selection.
+- Dataset version used.
+
+Do not use model accuracy or model error categories when selecting the
+annotation subset.
+
+### 6.11 Independence rules
+
+During independent annotation:
+
+- Annotator A must not see Annotator B's labels.
+- Annotator B must not see Annotator A's labels.
+- Neither annotator may see model predictions.
+- Neither annotator may see BanglaMate outputs.
+- Neither annotator may see hidden researcher-expected labels.
+- Annotators must not discuss individual cases before submitting their files.
+- Each annotator must receive independently randomized item order.
+- Raw annotation files must be stored separately.
+
+Questions about file access, field meanings or the annotation interface are
+allowed.
+
+Questions such as the following must not be answered during independent
+annotation:
+
+> Should this particular example be Apni?
+
+That question would influence the annotation decision.
+
+### 6.12 Raw annotation files
+
+Raw annotation files will be stored separately.
+
+Recommended paths:
+
+```text
+data/annotations/raw/ANN_A.csv
+data/annotations/raw/ANN_B.csv
+```
+
+Raw annotation files must:
+
+- Preserve the original submitted answers.
+- Never be silently overwritten.
+- Include the annotation-guide version.
+- Include timestamps.
+- Include all confidence and answerability fields.
+- Be backed up after every completed session.
+- Remain separate from adjudicated gold labels.
+
+Corrections to accidental data-entry mistakes must be recorded separately.
+
+### 6.13 Agreement calculation
+
+Agreement will be calculated using only cases independently annotated by both
+Annotator A and Annotator B.
+
+Agreement measures will include:
+
+- Exact primary-label agreement.
+- Cohen's kappa for primary labels.
+- Acceptable-register-set overlap.
+- Agreement by Tui, Tumi and Apni.
+- Agreement by changed-cue type.
+- Agreement by domain.
+- Number and percentage of low-confidence cases.
+
+Agreement must be calculated before adjudication.
+
+Do not calculate agreement using the final adjudicated labels because
+adjudication would artificially increase agreement.
+
+A pilot Cohen's kappa below 0.60 will trigger a review of:
+
+- Annotation instructions.
+- Label prevalence.
+- Missing context.
+- Contradictory fields.
+- Systematic label confusion.
+- Genuine cultural variation.
+
+The value 0.60 is a review trigger, not an automatic publication threshold
+and not permission to remove difficult cases.
+
+### 6.14 Acceptable-set overlap
+
+Primary-label agreement alone may underestimate agreement when both
+annotators consider more than one register acceptable.
+
+Example:
+
+Annotator A:
+
+```text
+primary_register = TUMI
+secondary_register = APNI
+```
+
+Annotator B:
+
+```text
+primary_register = APNI
+secondary_register = TUMI
+```
+
+Their primary labels differ, but their acceptable sets are identical:
+
+```text
+[TUMI, APNI]
+```
+
+Therefore, acceptable-set overlap will be reported separately from Cohen's
+kappa.
+
+### 6.15 Disagreement categories
+
+Every shared-subset disagreement should be assigned one category:
+
+- `PRIMARY_PREFERENCE_DIFFERENCE`
+- `SECONDARY_LABEL_DIFFERENCE`
+- `MISSING_CONTEXT`
+- `CONTRADICTORY_CONTEXT`
+- `CULTURAL_VARIATION`
+- `INSTRUCTION_MISUNDERSTANDING`
+- `DATA_ENTRY_ERROR`
+- `UNNATURAL_MESSAGE`
+- `OTHER_DOCUMENTED`
+
+The category should be assigned before determining the final gold label when
+possible.
+
+### 6.16 Adjudication procedure
+
+Adjudication occurs only after independent annotations are saved and agreement
+is calculated.
+
+Procedure:
+
+1. Create a list of disagreements.
+2. Hide unnecessary personal annotator information.
+3. Review the message and all context fields.
+4. Review both annotations and reason codes.
+5. Determine whether the disagreement results from missing information,
+   misunderstanding or genuine variation.
+6. Preserve both original raw annotations.
+7. Assign a final primary register when justified.
+8. Add a secondary acceptable register when genuinely appropriate.
+9. Revise or exclude structurally weak cases.
+10. Record the adjudicator's decision and reason.
+11. Reannotate materially revised cases.
+12. Save adjudicated labels in a new file.
+
+Recommended adjudication path:
+
+`data/annotations/adjudication.csv`
+
+Recommended gold-data path:
+
+`data/final/gold_v1.0.csv`
+
+The adjudicator must not delete or replace the original raw annotation files.
+
+### 6.17 Cases annotated only by Annotator A
+
+Approximately 300 final benchmark instances will initially have only
+Annotator A's annotation.
+
+For those instances:
+
+- Annotator A's label may become the provisional gold label.
+- Every low-confidence case must receive additional review.
+- Every non-answerable case must receive additional review.
+- Every case flagged by a validator must receive additional review.
+- Cases containing a secondary label may be sampled for review.
+- The researcher should inspect a random quality-control sample.
+- Materially revised instances must be reannotated.
+
+The thesis and data card must state clearly that only the frozen 150-instance
+subset received two complete independent annotations.
+
+### 6.18 Annotation quality-control files
+
+The annotation process should eventually produce:
+
+```text
+docs/ANNOTATION_GUIDE_v1.0.md
+data/annotations/qualification/ANN_A.csv
+data/annotations/qualification/ANN_B.csv
+data/annotations/pilot/ANN_A.csv
+data/annotations/pilot/ANN_B.csv
+data/annotations/raw/ANN_A.csv
+data/annotations/raw/ANN_B.csv
+data/annotations/annotator_b_family_ids.txt
+data/annotations/adjudication.csv
+data/annotations/agreement_report.csv
+```
+
+These files will be created in later phases.
+
+Phase 1 only freezes the rules and expected paths.
+
+### 6.19 Estimated annotation workload
+
+Approximate annotation effort is:
+
+| Activity | Annotator A | Annotator B |
+|---|---:|---:|
+| Qualification | 15–30 minutes | 15–30 minutes |
+| Pilot | 45–75 minutes | 45–75 minutes |
+| Full annotation | 4–8 hours | 1.5–3 hours |
+| Additional review | 1–2 hours | 1–2 hours |
+
+These are planning estimates, not required completion speeds.
+
+Annotators should prioritize accuracy over speed.
+
+### 6.20 Annotation freeze conditions
+
+Human annotation is considered complete only when:
+
+- Qualification results are saved.
+- Pilot results and agreement are reported.
+- The annotation guide is frozen.
+- Annotator A completes all required final instances.
+- Annotator B completes the frozen 150-instance subset.
+- Raw files are preserved separately.
+- Agreement is calculated before adjudication.
+- Disagreements are categorized.
+- Required adjudication is complete.
+- Flagged cases are resolved.
+- Gold labels are stored separately from raw labels.
+- Annotation limitations are documented.
