@@ -41,8 +41,8 @@ The student researcher completed the following checks:
 | F002 | C002 | Academic | Assignment er deadline niye ektu kotha chilo. | familiarity | setting |
 | F003 | C003 | Academic | Report ta niye ektu motamot dorkar chilo. | authority | setting |
 | F004 | C006 | Professional | Client er file ta ajker moddhe dorkar. | authority | familiarity |
-| F005 | C007 | Professional | Agamikaler shift ta confirm kora dorkar. | relative_age | setting |
-| F006 | C008 | Professional | Ei proposal er approval dorkar. | authority | relative_age |
+| F005 | C007 | Professional | Agamikaler shift er shomoy ta confirm kora dorkar. | relative_age | setting |
+| F006 | C008 | Professional | Ei prostab ta onumodon kora dorkar. | authority | relative_age |
 | F007 | C011 | Family | Bari pouchhanor por ekbar janale bhalo hoy. | relative_age | familiarity |
 | F008 | C012 | Family | Ghorer kaj e ektu shahajjo dorkar. | authority | familiarity |
 | F009 | C013 | Family | Oshudh ta rate khete hobe. | relative_age | setting |
