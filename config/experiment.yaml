@@ -1,0 +1,61 @@
+project:
+  name: "SocialCue-BN"
+  protocol_version: "2.0-APPROVED"
+
+runtime:
+  mode: "dummy"
+  remote_api_only: true
+  local_llm_allowed: false
+
+safety:
+  hard_budget_usd: 0.0
+  paid_fallback_allowed: false
+  log_api_keys: false
+
+generation:
+  temperature: 0.0
+  max_output_tokens: 128
+  seed: 42
+  retry_count: 2
+  request_timeout_seconds: 60
+
+prompts:
+  core_version: "0.1-DRAFT"
+  extension_version: "0.1-DRAFT"
+
+model:
+  adapter: "dummy"
+  provider: "dummy"
+  name: "fixed-label-dummy"
+  version: "1.0"
+  api_key_env: "SOCIALCUE_API_KEY"
+
+dataset:
+  total_families: 150
+  contexts_per_family: 3
+  total_instances: 450
+  development_families: 30
+  development_instances: 90
+  test_families: 120
+  test_instances: 360
+  core_model_count: 3
+  core_prompt_count: 3
+  projected_core_responses: 4050
+
+extension:
+  enabled: true
+  test_families: 30
+  test_instances: 90
+  maximum_total_calls: 600
+
+paths:
+  raw_data: "data/raw"
+  pilot_data: "data/pilot"
+  annotations: "data/annotations"
+  final_data: "data/final"
+  core_prompts: "prompts/core"
+  extension_prompts: "prompts/extension"
+  core_raw_results: "results/raw/core"
+  extension_raw_results: "results/raw/extension"
+  processed_results: "results/processed"
+  figures: "figures"
