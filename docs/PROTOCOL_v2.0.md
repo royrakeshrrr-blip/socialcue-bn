@@ -1686,3 +1686,408 @@ Human annotation is considered complete only when:
 - Flagged cases are resolved.
 - Gold labels are stored separately from raw labels.
 - Annotation limitations are documented.
+
+## 7. Development/Test Split and Data-Leakage Prevention
+
+### 7.1 Purpose of the split
+
+The final benchmark will be divided into:
+
+- A development set used for prompt and configuration development.
+- A test set used only for the final frozen evaluation.
+
+The development set is comparable to practice material.
+
+The test set is comparable to an unseen final examination.
+
+Model prompts, demonstrations, parameters and parsing rules may be improved
+using development data only.
+
+They must not be improved after observing test-set performance.
+
+### 7.2 Split size
+
+The split will contain:
+
+| Split | Message families | Instances | Percentage |
+|---|---:|---:|---:|
+| Development | 30 | 90 | 20% |
+| Test | 120 | 360 | 80% |
+| Total | 150 | 450 | 100% |
+
+Calculation:
+
+```text
+Development: 30 families × 3 instances = 90 instances
+Test: 120 families × 3 instances = 360 instances
+Total: 150 families × 3 instances = 450 instances
+```
+
+### 7.3 Family-level splitting
+
+The split must be performed using `message_family_id`.
+
+All three instances of one family must belong to the same split.
+
+Valid example:
+
+```text
+F001-A → Development
+F001-B → Development
+F001-C → Development
+```
+
+Invalid example:
+
+```text
+F001-A → Development
+F001-B → Test
+F001-C → Test
+```
+
+The invalid example causes data leakage because the same underlying message
+appears in both development and test data.
+
+Individual instances must never be randomly split without considering their
+message family.
+
+### 7.4 Split timing
+
+The actual split will be created only after:
+
+1. All 150 message families exist.
+2. All 450 instances pass structural validation.
+3. Human annotation is complete.
+4. Required adjudication is complete.
+5. The gold dataset version is frozen.
+6. No unresolved family-level errors remain.
+
+The split must be created before:
+
+- Prompt demonstrations are selected.
+- Models are compared.
+- Prompt wording is optimized.
+- Final model parameters are selected.
+- Core API experiments begin.
+
+### 7.5 Fixed random seed
+
+The split process will use the fixed random seed:
+
+`20260830`
+
+The seed is frozen before the completed dataset and model results are
+available.
+
+The researcher must not repeatedly change the random seed to obtain:
+
+- Higher model accuracy.
+- Easier test examples.
+- More favorable label distributions.
+- Better-looking results.
+- Fewer difficult cases.
+
+If the selected split has a serious predefined balance failure, limited
+family-level swaps may be performed before model experiments.
+
+Every swap must:
+
+- Preserve the 30/120 family counts.
+- Preserve family integrity.
+- Be performed without model results.
+- Be justified only by dataset balance.
+- Be recorded in the split report.
+
+### 7.6 Domain allocation
+
+The development set should contain approximately 20% of the families from
+every domain.
+
+If the final dataset follows the recommended domain allocation, the target
+development counts are:
+
+| Domain | Total families | Development families | Test families |
+|---|---:|---:|---:|
+| Academic | 30 | 6 | 24 |
+| Professional | 25 | 5 | 20 |
+| Family | 25 | 5 | 20 |
+| Friendship | 25 | 5 | 20 |
+| Service/Public | 25 | 5 | 20 |
+| Online Community | 20 | 4 | 16 |
+| Total | 150 | 30 | 120 |
+
+If final domain counts differ, approximately 20% of each domain should be
+allocated to development while maintaining exactly 30 development families.
+
+### 7.7 Additional balance checks
+
+After splitting, compare development and test distributions for:
+
+- Primary register.
+- Secondary acceptable register.
+- Changed-cue type.
+- Source register.
+- Domain.
+- Communicative intention.
+- Code-mixing level.
+- Answerability status.
+- Confidence level.
+
+Perfectly identical distributions are not required.
+
+However, the development set must contain:
+
+- Examples of Tui, Tumi and Apni.
+- Examples involving all four changed-cue types.
+- Examples from all six domains.
+- More than one source-register category.
+- Enough variation for prompt development.
+
+Do not remove naturally difficult cases solely to make the distributions
+appear cleaner.
+
+### 7.8 Duplicate and near-duplicate leakage
+
+Before freezing the split, check for:
+
+- Identical messages across different families.
+- Near-identical messages across different families.
+- Repeated templates with only one replaced word.
+- Duplicated contexts.
+- Pilot or qualification examples copied into the benchmark.
+- Prompt demonstrations that closely reproduce test messages.
+
+If near-duplicate families appear in different splits:
+
+1. Review whether they represent the same underlying communicative example.
+2. Move related families into the same split when justified.
+3. Replace or exclude an unjustified duplicate.
+4. Record the decision.
+5. Recalculate the split checks.
+
+### 7.9 Development-set permissions
+
+The development set may be used for:
+
+- Selecting prompt wording.
+- Selecting demonstrations.
+- Testing output schemas.
+- Improving the response parser.
+- Comparing deterministic parameter settings.
+- Testing model availability.
+- Identifying malformed-output problems.
+- Estimating token usage, latency and cost.
+- Running small stability checks.
+- Selecting one model for the later BanglaMate extension.
+
+Development-set results must still be logged.
+
+The researcher must not repeatedly tune prompts only to solve individual
+development examples without recording the changes.
+
+### 7.10 Test-set restrictions
+
+Before final test execution, the test set must not be used for:
+
+- Selecting prompt wording.
+- Selecting demonstrations.
+- Selecting models.
+- Selecting temperature.
+- Selecting maximum output tokens.
+- Adding special-case instructions.
+- Changing the parser because of a test answer.
+- Selecting a favorable random seed.
+- Removing cases where a model performs poorly.
+- Estimating expected test accuracy.
+
+Test messages, labels and examples must never be included in prompt
+demonstrations.
+
+### 7.11 Prompt-demonstration rules
+
+All few-shot demonstrations must come from development families.
+
+For every demonstration, record:
+
+- Demonstration ID.
+- Source development family ID.
+- Prompt condition using it.
+- Prompt version.
+- Date selected.
+- Reason for selection.
+
+Demonstrations should represent multiple labels and cue types.
+
+A demonstration must not be selected because it resembles a known test
+instance.
+
+The final list of demonstration IDs must be frozen before test execution.
+
+### 7.12 Test-access rule
+
+Before prompt and model freeze, test-set access should be limited to:
+
+- Automated structural validation.
+- Automated checksum generation.
+- Automated duplicate detection.
+- Split-balance summaries.
+- File-integrity checks.
+
+The researcher must not inspect test model performance during prompt
+development.
+
+If the test data must be opened to investigate a genuine technical or data
+problem, record:
+
+- Date and time.
+- Person accessing it.
+- Reason for access.
+- Files accessed.
+- Whether labels or model outputs were visible.
+- Action taken.
+- Whether a protocol amendment is required.
+
+Recommended record:
+
+`docs/TEST_ACCESS_LOG.md`
+
+### 7.13 Core test execution rule
+
+Before test execution, freeze:
+
+- Dataset version.
+- Development and test family IDs.
+- Model names and versions.
+- Prompt text.
+- Demonstration IDs.
+- Model parameters.
+- Output schema.
+- Parser version.
+- Retry rules.
+- Analysis plan.
+- Cost limit.
+
+During test execution:
+
+- Monitor technical failures only.
+- Do not modify prompts based on apparent answer quality.
+- Do not stop a batch because the accuracy appears low.
+- Preserve all raw responses.
+- Record every permitted retry.
+- Complete and reconcile the planned test inventory.
+
+After test execution begins, any changed configuration must receive a new
+experiment name and must be reported as exploratory unless the protocol
+explicitly permits the change.
+
+### 7.14 BanglaMate extension separation
+
+The 90-case BanglaMate extension sample will be drawn from the frozen test set
+only after core results are frozen.
+
+The extension sample must not be used to:
+
+- Modify the core prompts.
+- Modify core gold labels.
+- Remove difficult core cases.
+- Recalculate the core split.
+- Replace core test results.
+- Select a model using extension performance.
+
+The extension will use the model selected through a predeclared
+development-only selection rule.
+
+The extension sample must be frozen before rewrite outputs are generated.
+
+### 7.15 Dataset-publication rule
+
+The complete benchmark should not be publicly released before the frozen model
+evaluation is finished.
+
+Before evaluation:
+
+- Keep the GitHub repository private.
+- Do not upload the test set to public websites.
+- Do not place test examples in public prompts or discussions.
+- Share files only with authorized annotators, the supervisor and approved
+  reviewers.
+
+A documented dataset release may be prepared after the primary experiments
+are complete.
+
+### 7.16 Split files
+
+The split process will eventually produce:
+
+```text
+data/final/dev_family_ids.txt
+data/final/test_family_ids.txt
+data/final/dev_ids.txt
+data/final/test_ids.txt
+data/final/split_manifest.csv
+data/final/split_report.md
+data/final/split_checksums.txt
+docs/TEST_ACCESS_LOG.md
+```
+
+These files will be created in a later phase.
+
+Phase 1 only defines the required rules and file paths.
+
+### 7.17 Split-manifest fields
+
+The split manifest should contain:
+
+| Field | Meaning |
+|---|---|
+| `message_family_id` | Family identifier |
+| `instance_id` | Instance identifier |
+| `split` | DEVELOPMENT or TEST |
+| `domain` | Scenario domain |
+| `primary_register` | Frozen gold primary label |
+| `changed_cue_from_A` | Controlled cue change |
+| `source_register` | Register present in the original message |
+| `dataset_version` | Frozen dataset version |
+| `split_seed` | Random seed used |
+| `split_timestamp` | Date and time of split |
+
+### 7.18 Automated split checks
+
+The split validator must confirm:
+
+- Development contains exactly 30 families.
+- Development contains exactly 90 instances.
+- Test contains exactly 120 families.
+- Test contains exactly 360 instances.
+- The complete dataset contains 150 families.
+- The complete dataset contains 450 instances.
+- Every family has exactly three instances.
+- No family appears in both splits.
+- No instance appears in both splits.
+- Development and test family intersections are empty.
+- Development and test family unions contain all 150 families.
+- Development and test instance unions contain all 450 instances.
+- Every domain appears in development.
+- Every controlled cue appears in development.
+- Tui, Tumi and Apni appear in development.
+- Demonstration IDs belong only to development.
+- Split files have recorded checksums.
+
+### 7.19 Split freeze conditions
+
+The split is considered frozen only when:
+
+- Gold dataset version is frozen.
+- Random seed is recorded.
+- Family-level splitting is complete.
+- Development and test counts are correct.
+- Distribution reports are generated.
+- Duplicate checks are complete.
+- Any family swaps are documented.
+- Automated split validation passes.
+- Split files are saved.
+- Checksums are recorded.
+- Prompt demonstrations have not yet used test data.
+
+After split freeze, family membership must not be changed without a documented
+protocol amendment.
