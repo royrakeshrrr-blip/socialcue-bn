@@ -2091,3 +2091,568 @@ The split is considered frozen only when:
 
 After split freeze, family membership must not be changed without a documented
 protocol amendment.
+
+## 8. Core Models, Prompt Conditions, and Output Format
+
+### 8.1 Core experiment objective
+
+The core experiment will determine whether language models select Tui, Tumi
+and Apni more accurately and consistently when they receive explicit social
+context.
+
+Every eligible model will be evaluated under the same three conditions:
+
+- `P0_MESSAGE_ONLY`
+- `P1_NARRATIVE_CONTEXT`
+- `P2_STRUCTURED_CONTEXT`
+
+The same frozen dataset instances will be used for every model and prompt
+condition.
+
+### 8.2 Core experiment matrix
+
+The complete primary experiment contains:
+
+```text
+450 instances × 3 models × 3 prompt conditions = 4,050 responses
+```
+
+Breakdown:
+
+```text
+Development:
+90 instances × 3 models × 3 conditions = 810 responses
+
+Test:
+360 instances × 3 models × 3 conditions = 3,240 responses
+```
+
+Prompt-development trials, technical dry runs and permitted retries will be
+recorded separately and will not be confused with the final response
+inventory.
+
+### 8.3 Model count
+
+The primary experiment will use exactly three remotely hosted API models.
+
+All three models must:
+
+- Be accessible through a programmatic API.
+- Be available throughout the planned experiment period.
+- Accept the required Romanized Bangla prompt.
+- Support sufficient context length.
+- Return text or structured output that can be saved.
+- Have an identifiable model name or version.
+- Be affordable under the approved API budget.
+- Complete a development dry run.
+- Be used under all three prompt conditions.
+
+Manual ChatGPT, Gemini, Claude or other website conversations must not be
+used as primary experimental records.
+
+The experiment runner must call the models programmatically and save every
+request and response.
+
+### 8.4 Model-selection criteria
+
+The exact model names will be selected in a later phase using development
+data and the following predeclared criteria:
+
+| Criterion | Requirement |
+|---|---|
+| API availability | Reliable programmatic access |
+| Version identification | Exact model identifier can be recorded |
+| Structured output | Can follow the required JSON schema |
+| Romanized Bangla capability | Can process the task without systematic technical failure |
+| Cost | Fits the approved budget |
+| Latency | Can complete the experiment within the schedule |
+| Provider diversity | Prefer models from more than one provider when feasible |
+| Reproducibility | Parameters, prompts and raw outputs can be saved |
+
+Models must not be selected using test-set accuracy.
+
+A model may be rejected during development when:
+
+- It cannot reliably access the API.
+- Its responses repeatedly fail the output schema.
+- Its projected cost exceeds the budget.
+- The selected model version will not remain available.
+- It produces systematic empty or blocked outputs.
+- It cannot complete a controlled dry run.
+
+Model rejection reasons must be documented.
+
+### 8.5 Model diversity rule
+
+When feasible, the three selected models should represent more than one:
+
+- API provider.
+- Model family.
+- Price level.
+- System design.
+
+A suitable selection may include:
+
+- One strong general-purpose commercial model.
+- One model from a different commercial provider.
+- One affordable or remotely hosted open-weight model.
+
+This is a selection principle, not a requirement to run a model locally.
+
+Local LLM inference is outside the required thesis scope.
+
+### 8.6 Model manifest
+
+The final selected models will later be recorded in:
+
+`config/MODEL_MANIFEST.csv`
+
+The model manifest should contain:
+
+| Field | Meaning |
+|---|---|
+| `model_code` | Internal identifier such as M1, M2 or M3 |
+| `provider` | API provider |
+| `model_id` | Exact API model identifier |
+| `model_version` | Recorded version or snapshot |
+| `access_date` | Date availability was checked |
+| `temperature` | Frozen generation temperature |
+| `max_output_tokens` | Frozen output limit |
+| `seed` | Seed if the provider supports one |
+| `response_format` | JSON or text mode |
+| `price_reference_date` | Date used for cost projection |
+| `selection_reason` | Why the model was included |
+| `status` | SELECTED, REJECTED or REPLACED |
+
+Actual model names will not be inserted until the model-selection phase.
+
+### 8.7 Common instruction across conditions
+
+Every prompt condition must use the same:
+
+- Task definition.
+- Tui, Tumi and Apni definitions.
+- Required JSON output schema.
+- Confidence options.
+- Reason-code options.
+- Model parameters where supported.
+- Language describing the required decision.
+
+The conditions should differ only in the social-context representation visible
+to the model.
+
+The model will answer:
+
+> Which Tui, Tumi or Apni register would be most socially appropriate for the
+> supplied Romanized Bangla message and the information available in this
+> prompt?
+
+The model must not receive hidden chain-of-thought instructions.
+
+### 8.8 P0: Message-only condition
+
+Condition name:
+
+`P0_MESSAGE_ONLY`
+
+The model receives:
+
+- The Romanized Bangla message.
+- Short definitions of Tui, Tumi and Apni.
+- The required output schema.
+
+The model does not receive:
+
+- Speaker role.
+- Recipient role.
+- Authority.
+- Relative age.
+- Familiarity.
+- Setting.
+- Domain.
+- Communicative intention.
+- Gold labels.
+
+Example input structure:
+
+```text
+Task: Select the most socially appropriate second-person register.
+
+Labels:
+TUI = intimate or strongly downward register
+TUMI = familiar or neutral-personal register
+APNI = respectful or formal register
+
+Message:
+kalke report ta niye kotha bola jabe?
+
+Return only the required JSON object.
+```
+
+Purpose:
+
+The message-only condition measures model behavior when recipient context is
+not explicitly available.
+
+### 8.9 P1: Narrative-context condition
+
+Condition name:
+
+`P1_NARRATIVE_CONTEXT`
+
+The model receives:
+
+- Everything provided in P0.
+- A short natural-language description of the social context.
+
+The narrative must be generated deterministically from the structured context
+fields.
+
+It must not add information that is absent from the structured record.
+
+Example narrative:
+
+```text
+The speaker is a student addressing a teacher. The recipient has higher
+authority than the speaker, is older, and has low familiarity with the
+speaker. The communication occurs in a formal academic setting.
+```
+
+The narrative generator must use a fixed template.
+
+It must not use another language model to invent or enrich context during the
+final experiment.
+
+Purpose:
+
+The narrative condition tests whether ordinary natural-language context helps
+the model select an appropriate register.
+
+### 8.10 P2: Structured-context condition
+
+Condition name:
+
+`P2_STRUCTURED_CONTEXT`
+
+The model receives:
+
+- Everything provided in P0.
+- The same social information used in P1.
+- Social information represented through fixed field names and values.
+
+Example structured context:
+
+```json
+{
+  "domain": "ACADEMIC",
+  "intent": "REQUEST",
+  "speaker_role": "STUDENT",
+  "recipient_role": "TEACHER",
+  "authority_relation": "HIGHER",
+  "relative_age": "OLDER",
+  "familiarity": "LOW",
+  "setting": "FORMAL"
+}
+```
+
+Purpose:
+
+The structured condition tests whether a fixed and explicit representation of
+social context improves register selection and cue sensitivity.
+
+P1 and P2 must contain the same underlying social information. Only the
+presentation format may differ.
+
+### 8.11 Demonstration-control rule
+
+If few-shot demonstrations are used, all three prompt conditions must use the
+same number of demonstrations and the same development-family IDs.
+
+Recommended design:
+
+- Three demonstrations.
+- One example with primary gold Tui.
+- One example with primary gold Tumi.
+- One example with primary gold Apni.
+- All demonstrations selected from development families.
+- No demonstration selected from test families.
+
+The demonstration content will be adapted to each condition:
+
+- P0 receives message-only versions.
+- P1 receives narrative-context versions.
+- P2 receives structured-context versions.
+
+This prevents the structured condition from receiving more examples than the
+other conditions.
+
+If the supervisor requires demonstrations only in P2, the condition must be
+described as a combined structured-context-plus-demonstration intervention.
+The thesis must not claim that any improvement was caused by structure alone.
+
+The final zero-shot or parallel few-shot decision must be made using
+development data and frozen before test execution.
+
+### 8.12 Information prohibited from model input
+
+The following fields must never be shown to the model during the primary
+register-selection task:
+
+- `primary_register`
+- `secondary_register`
+- `acceptable_registers`
+- `answerability_status`
+- Annotator labels
+- Adjudication decisions
+- Researcher-expected labels
+- Model scores
+- Error categories
+- `changed_cue_from_A`
+- Comparison direction
+- Test-set performance
+- Another evaluated model's prediction
+
+The model does not need to see:
+
+- `instance_id`
+- `message_family_id`
+- Split assignment
+- Annotator identifiers
+- Dataset version
+- Review actions
+
+These fields may be retained in experiment metadata outside the rendered
+prompt.
+
+### 8.13 Required model output
+
+Every model must return one JSON object with this schema:
+
+```json
+{
+  "register": "TUI",
+  "confidence": "high",
+  "reason_codes": ["AUTHORITY", "SETTING"]
+}
+```
+
+Allowed `register` values:
+
+- `TUI`
+- `TUMI`
+- `APNI`
+
+Allowed `confidence` values:
+
+- `low`
+- `medium`
+- `high`
+
+Allowed `reason_codes`:
+
+- `AUTHORITY`
+- `AGE`
+- `FAMILIARITY`
+- `SETTING`
+- `KINSHIP`
+- `ROLE`
+- `EMOTIONAL_STANCE`
+- `MESSAGE_FORM`
+- `OTHER`
+
+The model must return only the JSON object.
+
+It must not return:
+
+- A Markdown explanation.
+- An essay.
+- Multiple predictions.
+- An acceptable-register set.
+- Hidden chain-of-thought.
+- A rewritten message during the core selection task.
+- Additional keys not defined by the schema.
+
+### 8.14 Parser rules
+
+The response parser may:
+
+- Remove a surrounding Markdown JSON code fence.
+- Ignore harmless leading or trailing whitespace.
+- Normalize allowed label capitalization.
+- Validate the required keys.
+- Validate allowed categorical values.
+- Record whether a harmless formatting correction occurred.
+
+The parser must not:
+
+- Infer a register from unrelated prose.
+- Change one valid register into another.
+- Select the first label mentioned in an explanation.
+- Replace a missing prediction with a default label.
+- Use the gold label to repair an output.
+- Silently discard invalid responses.
+
+Every parsed response must receive one status:
+
+- `VALID`
+- `RECOVERABLE_FORMAT`
+- `INVALID_JSON`
+- `INVALID_REGISTER`
+- `MISSING_FIELD`
+- `EXTRA_UNAPPROVED_FIELD`
+- `EMPTY_RESPONSE`
+- `PROVIDER_ERROR`
+- `BLOCKED`
+
+Raw responses must be preserved before parsing.
+
+### 8.15 Prompt-development rules
+
+Prompt development may use only development data.
+
+The researcher may modify prompts to address general problems such as:
+
+- Unclear task wording.
+- Repeated invalid JSON.
+- Misunderstood label definitions.
+- Missing required fields.
+- Excessively long outputs.
+- Inconsistent formatting.
+
+The researcher must not add special instructions designed only to solve one
+individual test instance.
+
+Every prompt revision must record:
+
+- Prompt condition.
+- Previous version.
+- New version.
+- Reason for change.
+- Development evidence.
+- Date.
+- Researcher.
+- Whether test results had been observed.
+
+### 8.16 Prompt files
+
+The final prompts will later be stored in:
+
+```text
+prompts/core/P0_message_only_v1.txt
+prompts/core/P1_narrative_context_v1.txt
+prompts/core/P2_structured_context_v1.txt
+prompts/core/system_message_v1.txt
+prompts/PROMPT_MANIFEST.csv
+```
+
+Phase 1 defines the required conditions.
+
+The actual prompt files will be written and tested in a later phase.
+
+### 8.17 Prompt manifest
+
+The prompt manifest should contain:
+
+| Field | Meaning |
+|---|---|
+| `prompt_code` | P0, P1 or P2 |
+| `prompt_version` | Frozen prompt version |
+| `prompt_path` | File containing the prompt |
+| `system_prompt_path` | Common system instruction |
+| `demonstration_ids` | Development-only example IDs |
+| `demonstration_count` | Number of demonstrations |
+| `template_checksum` | Prompt-file checksum |
+| `freeze_date` | Date prompt was frozen |
+| `approved_by` | Supervisor or researcher according to protocol |
+| `status` | DEVELOPMENT or FROZEN |
+
+### 8.18 Generation-parameter rules
+
+Use deterministic settings where the provider supports them.
+
+Recommended starting settings:
+
+```text
+temperature = 0
+max_output_tokens = 100
+number_of_outputs = 1
+```
+
+If a provider does not support temperature zero, use its closest deterministic
+setting.
+
+Exact provider-specific values will be tested using development data and
+recorded in the model manifest.
+
+The final test experiment must not give one model:
+
+- More output tokens without justification.
+- More demonstrations.
+- More context.
+- Different label definitions.
+- Additional retry opportunities.
+
+Provider-specific technical differences must be documented.
+
+### 8.19 Stability check
+
+Because API models may not be completely deterministic, a small repeated-run
+stability check may be performed on development data.
+
+Recommended stability sample:
+
+- Ten development instances.
+- All three labels represented when possible.
+- Each selected model.
+- Each prompt condition.
+- Two additional repeated runs.
+
+The stability check must:
+
+- Use development data only.
+- Be reported separately from the primary experiment.
+- Not replace the one-response-per-condition primary test design.
+- Record exact parameters and dates.
+
+### 8.20 Model replacement rule
+
+If a selected model becomes unavailable before test execution:
+
+1. Record the unavailable model and date.
+2. Select a replacement using the original eligibility criteria.
+3. Rerun required development validation.
+4. Update the model manifest.
+5. Update the cost projection.
+6. Freeze the replacement before test execution.
+
+If a model becomes unavailable during test execution:
+
+1. Stop the affected model configuration.
+2. Do not silently mix model versions.
+3. Preserve completed raw outputs.
+4. Record the incident.
+5. Consult the frozen fallback rule.
+6. If a replacement is approved, run the replacement across the complete
+   required condition rather than only missing cases.
+7. Report the replacement transparently.
+
+### 8.21 Prompt and model freeze conditions
+
+The core prompt and model configuration is frozen only when:
+
+- Three eligible API models are selected.
+- Every model passes the development dry run.
+- P0, P1 and P2 prompts exist.
+- Label definitions are identical across conditions.
+- P1 and P2 contain the same underlying context information.
+- Demonstration rules are satisfied.
+- Demonstration IDs come only from development.
+- Output schema is frozen.
+- Parser tests pass.
+- Model parameters are recorded.
+- Prompt and model checksums are recorded.
+- Cost projection passes the approved budget.
+- Test data has not been used for prompt development.
+
+After this freeze, prompt or model changes require a new experiment name and
+documented change classification.
