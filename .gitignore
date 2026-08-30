@@ -201,3 +201,5 @@ annotations/identifiable/
 *.log
 Thumbs.db
 .DS_Store
+# Allow the safe API configuration template
+!.env.example
