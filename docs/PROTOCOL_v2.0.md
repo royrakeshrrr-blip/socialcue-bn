@@ -4466,3 +4466,739 @@ After supervisor approval, record:
 
 `FREE_API_EXECUTION_RULES_FROZEN`
 
+
+## 12. Constrained BanglaMate Four-Agent Extension
+
+### 12.1 Status and Purpose
+
+The BanglaMate four-agent system is a secondary exploratory extension of the SocialCue-BN core experiment.
+
+The core contribution remains:
+
+* the controlled Romanized Bangla dataset;
+* the counterfactual evaluation framework;
+* comparison of three models and three prompt conditions;
+* analysis of social-register selection.
+
+The extension investigates whether a small role-based agent pipeline can rewrite Romanized Bangla messages more appropriately for a specified social context.
+
+This extension does not involve:
+
+* training an LLM;
+* fine-tuning;
+* local LLM inference;
+* a knowledge graph;
+* long-term agent memory;
+* web browsing;
+* external tools;
+* autonomous conversation;
+* a production application;
+* multiple rounds of agent debate.
+
+The four agents are four role-specific prompts executed using one fixed free-tier API model. They are not four separate models or four separately purchased APIs.
+
+### 12.2 Extension Entry Gate
+
+Extension implementation and test execution may begin only after all of the following exist:
+
+* `DATASET_FROZEN`;
+* `ANNOTATION_FROZEN`;
+* `CORE_RUN_CONFIG_FROZEN`;
+* all 3,240 core test responses have been accounted for;
+* the core parser has completed;
+* the core evaluation has completed;
+* the primary core tables have been generated;
+* `CORE_RESULTS_FROZEN` has been created;
+* the supervisor has approved the extension;
+* at least 10 personal active-work hours remain available without endangering thesis submission.
+
+If these conditions are not met, the extension must be postponed or omitted.
+
+Omitting the extension does not invalidate the core thesis.
+
+### 12.3 Extension Research Questions
+
+The extension addresses three exploratory research questions.
+
+#### ERQ1
+
+Does a multi-stage role-based pipeline produce more context-appropriate Romanized Bangla rewrites than a direct single-call rewriting prompt?
+
+#### ERQ2
+
+Does adding one Critic evaluation and, when necessary, one controlled revision improve the initial pipeline output?
+
+#### ERQ3
+
+What additional API calls, tokens, latency, complexity, and failure risk are introduced by the multi-agent pipeline?
+
+The extension is exploratory. These questions must not replace the core research questions.
+
+### 12.4 Extension Model Selection
+
+The extension will use one of the three frozen core models.
+
+The extension model must be selected using development-set evidence only. Core test-set results must not determine the extension model.
+
+The selection procedure is:
+
+1. Identify which core models remain available through legitimate no-card free tiers.
+2. Compare their development acceptable-set accuracy.
+3. Select the model with the highest development acceptable-set accuracy.
+4. If two models are tied, select the model with the lower development invalid-output rate.
+5. If they remain tied, select the model with the more stable free quota.
+6. If they remain tied, select using alphabetical order of the fixed model IDs.
+
+The selected model must be recorded before core test accuracy is inspected.
+
+Create the milestone:
+
+`EXTENSION_MODEL_FROZEN`
+
+The same fixed model must be used for E0, E1, E2, and every agent role.
+
+### 12.5 Extension Test Subset
+
+The extension will use 30 complete families selected from the 120 frozen core test families.
+
+Because every selected family contains A, B, and C, the extension subset contains:
+
+`30 families × 3 instances = 90 test cases`
+
+The 30 families will be stratified by domain:
+
+* 5 ACADEMIC families;
+* 5 PROFESSIONAL families;
+* 5 FAMILY families;
+* 5 FRIENDSHIP families;
+* 5 SERVICE_PUBLIC families;
+* 5 ONLINE_COMMUNITY families.
+
+Selection will use the master seed:
+
+`20260830`
+
+The selected family IDs must be stored in:
+
+`data/splits/extension_test_families.csv`
+
+The selection must occur before core test results are inspected.
+
+No family may be selected because it produced an interesting, successful, or unsuccessful core result.
+
+### 12.6 Extension Experimental Conditions
+
+The extension compares three conditions.
+
+| Condition | Description                                       | Final output              |
+| --------- | ------------------------------------------------- | ------------------------- |
+| E0        | Direct single-call rewriting baseline             | Direct rewritten message  |
+| E1        | Complete A1–A4 pipeline with maximum one revision | Final post-Critic message |
+| E2        | Same pipeline without applying Critic feedback    | Cached initial A3 message |
+
+E2 does not require a separate set of API calls. It reuses the initial A3 output generated during E1.
+
+This caching makes the comparison exact:
+
+* E2 represents the pipeline before Critic intervention;
+* E1 represents the pipeline after the Critic decision;
+* E0 represents direct rewriting without the agent pipeline.
+
+### 12.7 Extension Call Count
+
+For every test case, the base calls are:
+
+* E0 direct rewriting: 1 call;
+* A1 Context Analyst: 1 call;
+* A2 Translator: 1 call;
+* A3 Diplomat: 1 call;
+* A4 Critic: 1 call.
+
+Therefore:
+
+`5 base calls × 90 cases = 450 base calls`
+
+If A4 returns `REVISE`, A3 may receive one additional revision call.
+
+The maximum revision count is:
+
+`1 revision × 90 cases = 90 additional calls`
+
+Therefore, the maximum final extension test workload is:
+
+`450 base calls + 90 revisions = 540 calls`
+
+No case may receive more than one revision call.
+
+### 12.8 Shared Input
+
+Every E0 or agent-pipeline case may receive only:
+
+* source Romanized Bangla message;
+* speaker role;
+* recipient role;
+* authority relation;
+* relative age;
+* familiarity;
+* setting;
+* domain;
+* communicative intent;
+* source register, if available as input metadata;
+* instructions required for the specific condition.
+
+The following are prohibited from all model prompts:
+
+* gold `primary_register`;
+* gold `secondary_register`;
+* acceptable-register set;
+* annotator confidence;
+* annotator notes;
+* adjudication decision;
+* gold counterfactual direction;
+* evaluation result;
+* test performance;
+* outputs from other experimental conditions, except the defined internal agent chain.
+
+### 12.9 Rewriting Requirements
+
+Every generated message must:
+
+* remain in Romanized Bangla;
+* preserve the original communicative intent;
+* preserve important factual content;
+* use a socially appropriate register;
+* avoid inventing information;
+* avoid adding promises, threats, requests, or commitments;
+* avoid changing the speaker or recipient;
+* avoid changing the requested action;
+* remain reasonably concise;
+* avoid unnecessary English expansion;
+* preserve ordinary source code-mixing when it is natural.
+
+A model may improve spelling or phrasing, but it must not silently change the intended meaning.
+
+Every final rewriting output must contain:
+
+* `rewritten_message`;
+* `register`;
+* `change_summary`.
+
+The `register` value must be one of:
+
+* TUI;
+* TUMI;
+* APNI.
+
+### 12.10 E0 Direct Baseline
+
+E0 receives the original message and complete permitted social context in one prompt.
+
+It is instructed to:
+
+1. understand the message;
+2. choose the appropriate register;
+3. rewrite the message directly;
+4. preserve meaning;
+5. return the required structured output.
+
+E0 does not receive:
+
+* A1 analysis;
+* A2 draft;
+* A3 output;
+* A4 feedback;
+* gold annotations.
+
+E0 requires exactly one successful model call per test case.
+
+### 12.11 Agent A1 — Context Analyst
+
+A1 interprets the original message and social context.
+
+A1 must produce:
+
+* concise meaning summary;
+* communicative intent;
+* relevant social cues;
+* recommended register;
+* ambiguity or risk notes;
+* content that must be preserved.
+
+A1 must not produce the final rewritten message.
+
+Its `recommended_register` must be one of TUI, TUMI, or APNI.
+
+A1 must make its decision from the permitted input context, not gold annotations.
+
+### 12.12 Agent A2 — Translator
+
+A2 converts the source message and A1 plan into a faithful candidate Romanized Bangla message.
+
+“Translator” means translating the source intent and A1 communication plan into an appropriate candidate message. It does not necessarily mean translating from English into Bangla.
+
+A2 must:
+
+* preserve meaning;
+* follow A1’s context analysis;
+* produce Romanized Bangla;
+* use the recommended social register;
+* avoid excessive politeness;
+* avoid insufficient politeness;
+* avoid unnecessary added information.
+
+A2 must return:
+
+* `draft_message`;
+* `register`;
+* `preservation_notes`.
+
+A2’s output is an intermediate draft, not the final system output.
+
+### 12.13 Agent A3 — Diplomat
+
+A3 receives:
+
+* original message;
+* permitted context;
+* A1 analysis;
+* A2 draft.
+
+A3 must improve:
+
+* social appropriateness;
+* politeness;
+* naturalness;
+* clarity;
+* context sensitivity.
+
+A3 must preserve the original intent and factual content.
+
+A3 returns:
+
+* `polished_message`;
+* `register`;
+* `changes_made`.
+
+The initial A3 output becomes the cached E2 output before A4 feedback is applied.
+
+### 12.14 Agent A4 — Critic
+
+A4 receives:
+
+* original message;
+* permitted context;
+* A1 analysis;
+* A2 draft;
+* initial A3 output.
+
+A4 evaluates:
+
+* register appropriateness;
+* meaning preservation;
+* naturalness;
+* unnecessary additions;
+* missing content;
+* social risk;
+* output-format validity.
+
+A4 must return one verdict:
+
+* `PASS`;
+* `REVISE`.
+
+If the verdict is `PASS`, A4 must not request stylistic changes that are merely optional.
+
+If the verdict is `REVISE`, A4 must provide concise, actionable revision instructions.
+
+A4 must return:
+
+* `verdict`;
+* `register_check`;
+* `meaning_check`;
+* `naturalness_check`;
+* `problem_codes`;
+* `revision_instructions`.
+
+A4 does not directly rewrite the message.
+
+### 12.15 Maximum One Revision
+
+If A4 returns `PASS`:
+
+* E2 is the initial A3 output;
+* E1 is the same initial A3 output;
+* no additional call is made.
+
+If A4 returns `REVISE`:
+
+1. Send the original case, previous A3 output, and A4 instructions back to A3.
+2. Ask A3 to produce one revised message.
+3. Store the revised output as E1.
+4. Preserve the original A3 output as E2.
+5. Do not send the revision back to A4.
+6. Do not allow another revision.
+
+This maximum-one-revision rule prevents uncontrolled agent loops and unpredictable quota use.
+
+### 12.16 Cache Integrity
+
+The E2 output must be copied directly from the initial A3 record.
+
+The experiment runner must not regenerate E2 separately.
+
+The cached E2 record must contain:
+
+* original A3 request ID;
+* original A3 output hash;
+* E2 condition ID;
+* cache timestamp;
+* confirmation that no additional API call was made.
+
+If E2 is accidentally regenerated, the duplicate must be preserved but excluded. The original cached A3 output remains official.
+
+### 12.17 Agent Independence and Memory Restrictions
+
+Every test case must be processed independently.
+
+Agents must not retain:
+
+* previous test cases;
+* previous model answers;
+* previous gold labels;
+* previous Critic decisions;
+* accumulated conversation memory.
+
+No agent may browse the internet, query a knowledge graph, search a database, or call an external tool.
+
+Only the explicitly passed output from the preceding agent may continue through the pipeline.
+
+### 12.18 Prompt and Parameter Control
+
+The following must be frozen before extension test execution:
+
+* E0 prompt;
+* A1 prompt;
+* A2 prompt;
+* A3 prompt;
+* A4 prompt;
+* A3 revision prompt;
+* model ID;
+* temperature;
+* maximum output tokens for each role;
+* output schema;
+* parser;
+* retry rules.
+
+The same fixed model must be used for all roles.
+
+Temperature should remain at zero or the lowest reliably supported setting.
+
+Agent prompts may differ because agents have different responsibilities. These differences are part of the defined pipeline.
+
+### 12.19 Development Limit
+
+Agent prompts may be developed using no more than 10 development instances.
+
+For each development case, the maximum call count is:
+
+* 1 E0 call;
+* 4 agent calls;
+* maximum 1 revision call.
+
+Therefore:
+
+`10 development cases × maximum 6 calls = maximum 60 development calls`
+
+The maximum total extension-related API allocation is therefore:
+
+* maximum 60 development calls;
+* maximum 540 final test calls;
+* maximum 600 calls overall.
+
+Development examples must not come from the frozen test split.
+
+### 12.20 Failure Handling
+
+The free-tier retry rules from Section 11 apply to every agent call.
+
+If E0 fails permanently:
+
+* E0 is invalid for that case;
+* E1 and E2 may still continue independently.
+
+If A1 fails permanently:
+
+* E1 and E2 are invalid for that case.
+
+If A2 fails permanently:
+
+* E1 and E2 are invalid for that case.
+
+If the initial A3 call fails permanently:
+
+* E1 and E2 are invalid for that case.
+
+If A4 fails permanently:
+
+* E2 remains valid;
+* E1 is invalid because the full pipeline was not completed.
+
+If A4 requests revision and the revision call fails permanently:
+
+* E2 remains valid;
+* E1 is invalid;
+* the initial A3 message must not be substituted as a completed E1 output.
+
+No human may manually replace a failed agent output.
+
+### 12.21 Automatic Extension Evaluation
+
+Automatic evaluation will be performed for all:
+
+`90 cases × 3 conditions = 270 final condition outputs`
+
+Automatic metrics include:
+
+* primary-register accuracy;
+* acceptable-set register accuracy;
+* invalid-output rate;
+* over-politeness rate;
+* under-politeness rate;
+* source-register-copy rate;
+* output length;
+* character-level edit distance;
+* token usage;
+* API call count;
+* latency.
+
+Because the extension contains 30 complete families, every condition also contains:
+
+`30 families × 2 controlled pairs = 60 controlled counterfactual pairs`
+
+Pair-level metrics include:
+
+* predicted direction;
+* directional consistency;
+* strict counterfactual consistency;
+* unnecessary-change rate.
+
+Register accuracy based on the model’s structured `register` field does not prove that the surface message actually uses that register correctly. The human evaluation provides a limited check of surface-message quality.
+
+### 12.22 Critic-Specific Evaluation
+
+The Critic analysis will report:
+
+* number of `PASS` verdicts;
+* number of `REVISE` verdicts;
+* revision rate;
+* most common Critic problem codes;
+* number of revisions that improve acceptable-set correctness;
+* number of revisions that reduce correctness;
+* number of revisions producing no register change;
+* change in naturalness ratings where human-evaluated;
+* additional token and latency cost;
+* revision-call failure rate.
+
+The Critic must not be declared beneficial merely because it requested many revisions.
+
+A useful Critic should improve or preserve quality without creating excessive semantic drift or unnecessary changes.
+
+### 12.23 Small Blinded Human Evaluation
+
+A small human evaluation will assess actual rewritten-message quality.
+
+Select six complete extension families:
+
+* one family from each domain;
+* three instances per family.
+
+This creates:
+
+`6 families × 3 instances = 18 cases`
+
+Evaluate all three conditions:
+
+`18 cases × 3 conditions = 54 rewritten messages`
+
+Both core annotators will independently evaluate all 54 messages.
+
+Outputs must be:
+
+* assigned anonymous IDs;
+* randomly ordered using seed `20260830`;
+* presented without E0, E1, or E2 labels;
+* presented without agent logs;
+* presented without gold labels.
+
+Evaluators may see:
+
+* original message;
+* permitted social context;
+* rewritten message.
+
+For every rewritten message, evaluators record:
+
+* observed register: TUI, TUMI, APNI, or UNCLEAR;
+* register appropriateness: ACCEPTABLE or UNACCEPTABLE;
+* meaning preservation: 1–5;
+* naturalness: 1–5;
+* social appropriateness: 1–5;
+* added-information flag: YES or NO;
+* harmful-meaning-change flag: YES or NO;
+* optional note.
+
+Rating anchors are:
+
+#### Meaning Preservation
+
+* 1: major meaning change;
+* 2: important information changed or lost;
+* 3: minor meaning drift;
+* 4: meaning mostly preserved;
+* 5: meaning fully preserved.
+
+#### Naturalness
+
+* 1: highly unnatural or difficult to understand;
+* 2: noticeably unnatural;
+* 3: understandable but imperfect;
+* 4: mostly natural;
+* 5: highly natural Romanized Bangla.
+
+#### Social Appropriateness
+
+* 1: clearly inappropriate;
+* 2: substantially mismatched;
+* 3: acceptable but imperfect;
+* 4: appropriate;
+* 5: highly appropriate for the context.
+
+### 12.24 Human-Evaluation Reporting
+
+The human evaluation will report:
+
+* median and distribution of each 1–5 score;
+* proportion rated register-acceptable;
+* proportion containing added information;
+* proportion containing harmful meaning changes;
+* raw agreement on observed register;
+* raw agreement on binary register acceptability;
+* Cohen’s kappa where appropriate;
+* disagreements by experimental condition.
+
+Because the human sample is small, its results are descriptive and exploratory.
+
+No broad population-level conclusion may be based solely on the 54-message human sample.
+
+### 12.25 Extension Statistical Interpretation
+
+Extension results are exploratory.
+
+Report:
+
+* condition scores;
+* paired percentage-point differences;
+* family-clustered 95% bootstrap confidence intervals;
+* exact number of evaluated families, instances, and pairs.
+
+The 30 extension families are the statistical clusters.
+
+Primary descriptive comparisons are:
+
+* E2 minus E0: multi-stage pipeline before Critic versus direct rewriting;
+* E1 minus E2: effect of the Critic-controlled revision mechanism;
+* E1 minus E0: complete pipeline versus direct rewriting.
+
+No confirmatory p-value is required for the extension.
+
+The extension must not be used to create additional confirmatory claims after core results are known.
+
+### 12.26 Interpretation Limits
+
+The following interpretation rules apply:
+
+1. E1 outperforming E0 supports only the tested complete pipeline under the selected model and dataset.
+2. It does not prove that multi-agent systems are universally superior.
+3. E2 outperforming E0 may indicate value from staged role decomposition.
+4. E1 outperforming E2 may indicate value from the Critic-controlled revision.
+5. E1 and E2 being identical in PASS cases is expected.
+6. Higher call count is part of the E1 system and must be reported.
+7. Better self-reported register accuracy does not guarantee a better surface message.
+8. Negative Critic effects must be reported.
+9. Mixed or negative extension results remain valid.
+10. The extension must not overshadow the core benchmark contribution.
+
+### 12.27 Planned Extension Files
+
+The extension will use:
+
+* `data/splits/extension_test_families.csv`
+* `data/splits/extension_human_eval_families.csv`
+* `prompts/extension/e0_direct.md`
+* `prompts/extension/a1_context_analyst.md`
+* `prompts/extension/a2_translator.md`
+* `prompts/extension/a3_diplomat.md`
+* `prompts/extension/a4_critic.md`
+* `prompts/extension/a3_revision.md`
+* `config/extension_run.yaml`
+* `results/raw/extension/`
+* `results/processed/extension_outputs.csv`
+* `results/processed/extension_critic_analysis.csv`
+* `analysis/extension_summary.md`
+* `figures/extension_comparisons/`
+
+These files will be created during later implementation phases, not during Phase 1 protocol writing.
+
+### 12.28 Scope and Time Stop Rules
+
+Extension work must stop if:
+
+* the core thesis is incomplete;
+* supervisor approval is absent;
+* no suitable free model remains available;
+* the free quota cannot support the experiment;
+* more than 10 personal active-work hours would be required;
+* extension work threatens the thesis-writing deadline;
+* implementation requires a knowledge graph;
+* implementation requires local model inference;
+* the system expands beyond one Critic decision;
+* additional agents, tools, or conditions are proposed after execution begins.
+
+If stopped, document the reason and proceed with the core thesis only.
+
+### 12.29 Extension Milestones
+
+The following milestones apply:
+
+Before implementation approval:
+
+`EXTENSION_PROTOCOL_FROZEN`
+
+After development prompts, model, parser, subset, and configuration are fixed:
+
+`EXTENSION_RUN_CONFIG_FROZEN`
+
+After all extension outputs and evaluations are complete:
+
+`EXTENSION_RESULTS_FROZEN`
+
+Changes after a milestone require a dated protocol amendment.
+
+### 12.30 Extension Freeze Conditions
+
+This section is ready for supervisor approval when:
+
+* the extension remains explicitly secondary;
+* the 90-case limit is accepted;
+* the 30-family stratified selection rule is accepted;
+* the one-model rule is accepted;
+* E0, E1, and E2 are clearly defined;
+* E2 caching is accepted;
+* the maximum-one-revision rule is accepted;
+* the maximum 540-test-call limit is accepted;
+* the maximum 600-call total limit is accepted;
+* the zero-cost constraint is accepted;
+* the small human-evaluation design is accepted;
+* the core-results entry gate is accepted;
+* no extension test output has been generated.
+
