@@ -2657,6 +2657,41 @@ The core prompt and model configuration is frozen only when:
 After this freeze, prompt or model changes require a new experiment name and
 documented change classification.
 
+### Zero-Cost Model-Access Constraint
+
+The researcher does not have access to an international payment card. Therefore, every model used in the core experiment must be accessible through a legitimate free API tier that does not require a payment method.
+
+The experiment will continue to compare three fixed language models. However, the exact models will be selected only after verifying:
+
+* free API access without entering card information;
+* sufficient request and token quotas;
+* acceptable Romanized Bangla performance on development examples;
+* availability of a fixed or clearly documented model identifier;
+* support for the required output format;
+* ability to complete 1,350 planned responses per model within the approved experiment period.
+
+Candidate access routes include:
+
+* an eligible Google Gemini free-tier model;
+* an eligible model hosted through the Groq free tier;
+* an eligible Mistral Free-mode model.
+
+These are candidate access routes, not frozen model selections.
+
+The final three models should represent three distinct model families. If a hosting provider serves a model developed by another organization, the thesis must record both:
+
+* model developer;
+* API hosting provider.
+
+No paid API, trial requiring a payment method, borrowed API key, shared account, or unofficial quota-circumvention method may be used.
+
+Multiple accounts, API keys, or projects must not be created for the purpose of bypassing a provider’s free-tier limits.
+
+A model must not be selected solely because it is free. It must first demonstrate that it can understand the task and produce valid TUI, TUMI, or APNI predictions on development examples.
+
+All selected model IDs, free-tier conditions, quota limits, and verification dates must be recorded before `CORE_RUN_CONFIG_FROZEN` is created.
+
+
 ## 9. Core Evaluation Metrics
 
 ### 9.1 Evaluation principle
@@ -3767,3 +3802,667 @@ Any later change must be documented in the change log with:
 * date;
 * whether test results had already been viewed;
 * effect on interpretation.
+
+## 11. Free-Tier API Execution, Retry, Storage, Quota, and Stop Rules
+
+### 11.1 Purpose
+
+This section defines how the core model experiment will be executed entirely through legitimate free API tiers without a payment card.
+
+The objectives are to:
+
+* keep total financial cost at zero;
+* verify that free quotas are sufficient before the test run;
+* prevent accidental activation of paid billing;
+* prevent duplicated API requests;
+* preserve all raw responses;
+* handle quota exhaustion consistently;
+* allow interrupted experiments to resume safely;
+* prevent favorable responses from being manually selected;
+* keep the core experiment separate from the BanglaMate extension.
+
+These rules must be implemented and tested using development data before the frozen test experiment begins.
+
+### 11.2 Core API Workload
+
+The core experiment contains:
+
+* 450 dataset instances;
+* three fixed language models;
+* three prompt conditions: P0, P1, and P2.
+
+The total expected core output count is:
+
+`450 × 3 × 3 = 4,050 responses`
+
+The development workload is:
+
+`90 development instances × 3 models × 3 prompts = 810 responses`
+
+The frozen test workload is:
+
+`360 test instances × 3 models × 3 prompts = 3,240 responses`
+
+Each individual model must produce:
+
+`450 instances × 3 prompts = 1,350 responses`
+
+Retries are additional technical attempts. They do not create additional experimental observations.
+
+### 11.3 Zero-Cost Constraint
+
+The financial limit for the core experiment is:
+
+`CORE_API_HARD_CAP_USD = 0.00`
+
+The researcher must not:
+
+* enter card information;
+* activate pay-as-you-go billing;
+* purchase API credits;
+* enable automatic billing;
+* enable automatic credit recharge;
+* use a paid endpoint accidentally;
+* borrow or purchase another person’s API key;
+* use an unauthorized shared account;
+* create additional accounts to bypass free quotas.
+
+If a provider requires payment information before API access, that provider is ineligible for this experiment.
+
+If a previously free model becomes paid before execution, it must be replaced before the test configuration is frozen.
+
+### 11.4 Candidate Free Access Routes
+
+The initial candidate access routes are:
+
+* an eligible Google Gemini free-tier model;
+* an eligible model hosted through the Groq free tier;
+* an eligible Mistral Free-mode model.
+
+The exact models are not frozen by this protocol section.
+
+Every final model must have:
+
+* a specific recorded model identifier;
+* a legitimate free API endpoint;
+* no payment-method requirement;
+* sufficient quota;
+* acceptable development-set performance;
+* stable availability during the planned execution window.
+
+The model developer and API hosting provider must be recorded separately.
+
+For example, a Qwen model hosted through Groq must not be described as a model developed by Groq. Qwen is the model family, while Groq is the API host.
+
+### 11.5 Fixed-Model Requirement
+
+Every core condition must use one specific model ID.
+
+The experiment must not use an automatic free-model router that silently selects different models for different requests.
+
+A provider may use internal infrastructure routing, but the requested model identity must remain fixed.
+
+Aliases containing words such as `latest`, `preview`, or `experimental` should be avoided when a fixed version is available.
+
+If only an alias is available, record:
+
+* complete requested model ID;
+* returned model ID, when available;
+* execution dates;
+* provider documentation date;
+* any observed model-version change.
+
+### 11.6 Free-Quota Feasibility Gate
+
+Before selecting a model, record its applicable:
+
+* requests-per-minute limit;
+* requests-per-day limit;
+* tokens-per-minute limit;
+* tokens-per-day limit;
+* monthly request or token allowance;
+* concurrency limit;
+* quota-reset time;
+* geographic restrictions;
+* free-tier data-use conditions.
+
+Quota information must be obtained from the researcher’s actual account dashboard because public limits may differ from account-specific limits.
+
+Screenshots or exported records of the applicable limits must be saved in:
+
+`docs/model_selection/quota_evidence/`
+
+Each model must support at least:
+
+* 1,350 planned core responses;
+* development testing;
+* a reasonable retry reserve.
+
+For planning purposes, quota feasibility should be calculated using:
+
+`1,350 planned responses + 10% reserve = 1,485 requests per model`
+
+A candidate model must be rejected if its free quota would make completion impractical within the approved thesis schedule.
+
+The target maximum calendar window for completing the core API run is:
+
+`21 days`
+
+This refers to calendar waiting time, not personal working hours.
+
+### 11.7 Free-Tier Data Protection
+
+Free-tier providers may apply different data-use and retention conditions from paid tiers.
+
+Therefore:
+
+* all dataset messages must be synthetic or safely constructed;
+* real private conversations must not be sent;
+* names, phone numbers, email addresses, student IDs, addresses, and other identifiers must not be included;
+* annotator identities must not appear in prompts;
+* supervisor or participant information must not be sent;
+* API keys must never appear in prompts.
+
+The model-access manifest must record the provider’s relevant data-use policy and access date.
+
+### 11.8 Unique Request Identification
+
+Every planned API request must have a deterministic unique request ID.
+
+The ID must identify:
+
+* dataset split;
+* family ID;
+* instance ID;
+* model ID;
+* prompt condition;
+* experiment version.
+
+Recommended structure:
+
+`core_test_F001_A_model1_P2_v1`
+
+Before making a request, the runner must check whether that request ID already has a completed response.
+
+A completed request must not be submitted again because its prediction appears incorrect.
+
+### 11.9 Request Reproducibility
+
+Every request record must preserve:
+
+* request ID;
+* family ID;
+* instance ID;
+* split;
+* model developer;
+* API hosting provider;
+* requested model identifier;
+* returned model identifier, if available;
+* prompt condition;
+* system prompt;
+* user prompt;
+* prompt-file hash;
+* dataset-file hash;
+* temperature;
+* maximum output tokens;
+* seed, if supported;
+* response-format setting;
+* request timestamp;
+* response timestamp;
+* latency;
+* attempt number;
+* request status;
+* raw response;
+* input-token count;
+* output-token count;
+* rate-limit information;
+* quota-remaining information, if available;
+* provider request ID, if available;
+* error type and message.
+
+### 11.10 Raw-Output Storage
+
+Raw API outputs must be saved before parsing or evaluation.
+
+Use the structure:
+
+* `results/raw/core/<run_id>/development/`
+* `results/raw/core/<run_id>/test/`
+* `results/raw/core/<run_id>/manifests/`
+* `results/processed/`
+
+Raw request attempts should be stored in JSONL batch files.
+
+Raw files are append-only. They must not be manually corrected, shortened, or overwritten.
+
+Parsed responses must be saved separately under `results/processed/`.
+
+The original raw response must always remain available.
+
+### 11.11 API-Key Security
+
+API keys must never be:
+
+* placed directly inside Python scripts;
+* placed inside notebooks;
+* written in protocol files;
+* included in screenshots;
+* committed to GitHub;
+* included in the final thesis;
+* sent to an AI assistant through a prompt.
+
+Keys must later be stored in a local `.env` file.
+
+The `.env` filename must appear in `.gitignore` before any key is created or stored.
+
+If GitHub Desktop shows `.env` in the Changes list, stop immediately and correct `.gitignore`.
+
+An accidentally published key must be revoked. Simply deleting the visible file is insufficient because it may remain in Git history.
+
+### 11.12 Permitted Deterministic Parsing
+
+The parser may perform only frozen deterministic operations, including:
+
+* removing leading and trailing whitespace;
+* removing one surrounding Markdown code fence;
+* normalizing label capitalization;
+* extracting required fields from valid JSON.
+
+The parser must not:
+
+* use another LLM to interpret an output;
+* infer a missing register from the explanation;
+* convert an unsupported label into a valid label;
+* manually correct an answer;
+* select a preferred answer from multiple conflicting answers;
+* remove an invalid output from evaluation.
+
+Parser rules must be tested on development examples before test execution.
+
+### 11.13 Retry-Eligible Failures
+
+A request may be retried only following a temporary technical failure, including:
+
+* HTTP 429 rate limiting;
+* HTTP 500-series errors;
+* network disconnection;
+* connection timeout;
+* temporary service unavailability;
+* a confirmed transport-level empty response.
+
+Every retry must use exactly the same:
+
+* model;
+* prompt;
+* instance;
+* temperature;
+* maximum output tokens;
+* output-format settings;
+* generation parameters.
+
+The prompt must not be modified during a retry.
+
+### 11.14 Free-Quota Exhaustion
+
+A daily or monthly free-quota limit is not treated as a model response.
+
+If a provider reports that the free quota has been exhausted:
+
+1. Record the event.
+2. Mark unsubmitted requests as `WAITING_FOR_QUOTA`.
+3. Stop sending new requests to that provider.
+4. Determine the official reset time.
+5. Wait for the legitimate quota reset.
+6. Resume only unresolved request IDs.
+7. Do not create another account or project to bypass the limit.
+
+A request must not be recorded as scientifically incorrect merely because it was waiting for the next free-quota period.
+
+If the quota does not reset as documented, pause and investigate using development requests only.
+
+### 11.15 Non-Retryable Model Responses
+
+The following successful API responses must not be retried:
+
+* an incorrect register prediction;
+* a culturally questionable prediction;
+* malformed model-generated JSON;
+* an unsupported output label;
+* a refusal;
+* a content-filter response;
+* conflicting labels;
+* a missing required field;
+* an undesirable explanation.
+
+These responses must remain in the raw output and be evaluated as invalid or incorrect according to the frozen rules.
+
+Authentication or permission errors require investigation. They must not be repeatedly retried.
+
+### 11.16 Maximum Technical Retry Procedure
+
+Every request is permitted:
+
+* one initial eligible transmission;
+* a maximum of two technical retries.
+
+This produces a maximum of three eligible transmission attempts.
+
+For a retryable error:
+
+1. Save the failed attempt.
+2. Read the provider’s `Retry-After` value, if supplied.
+3. Follow that value when reasonable.
+4. Otherwise, wait approximately 2 seconds before retry 1.
+5. Wait approximately 8 seconds before retry 2.
+6. Include a small random delay.
+7. Stop after the maximum attempt count.
+
+When a 429 response clearly represents daily or monthly quota exhaustion, follow Section 11.14 instead of repeatedly retrying.
+
+SDK automatic retry settings must be recorded and controlled.
+
+If all eligible technical attempts fail for reasons unrelated to quota exhaustion, record:
+
+`API_FAILURE`
+
+The unresolved response must remain in the evaluation denominator and count as incorrect.
+
+### 11.17 First-Successful-Response Rule
+
+The first successfully returned response becomes the official response.
+
+The researcher must not generate multiple successful answers and choose the best one.
+
+If accidental duplicate successful responses exist:
+
+1. Preserve all duplicate records.
+2. Select the earliest successful response by timestamp and attempt number.
+3. Record the incident.
+4. Do not select based on correctness.
+
+### 11.18 Quota-Projection Run
+
+Before authorizing the complete development and test experiments, perform a quota-projection run using 10 representative development instances.
+
+The sample should contain variation in:
+
+* message length;
+* domain;
+* source register;
+* social context;
+* Romanized spelling complexity.
+
+Run all 10 instances through:
+
+* all three models;
+* all three prompt conditions.
+
+The projection contains:
+
+`10 × 3 × 3 = 90 responses`
+
+If the exact configuration remains unchanged, these 90 responses may be reused as part of the 810 development responses.
+
+Frozen test instances must not be used for quota projection.
+
+### 11.19 Quota and Calendar-Time Calculation
+
+For every candidate model, calculate:
+
+* average input tokens per request;
+* average output tokens per request;
+* projected total input tokens;
+* projected total output tokens;
+* requests required;
+* request reserve;
+* estimated minimum completion days.
+
+Use:
+
+`Projected requests per model = 1,350`
+
+Use:
+
+`Reserved requests per model = 1,485`
+
+When a requests-per-day limit exists:
+
+`Request-based days = ceiling(1,485 ÷ requests-per-day limit)`
+
+When a tokens-per-day limit exists:
+
+`Token-based days = ceiling(projected total tokens ÷ tokens-per-day limit)`
+
+The estimated minimum duration is the larger of the request-based and token-based values.
+
+A model should not be frozen if the projection indicates that the core run cannot reasonably finish within 21 calendar days.
+
+### 11.20 Development Execution Stages
+
+#### Stage D1: Connection Test
+
+Run one development instance through one candidate model and one prompt.
+
+Confirm that:
+
+* the API key works;
+* no payment method is requested;
+* the request is free;
+* the response is stored;
+* token usage is recorded;
+* the request ID is correct;
+* no key appears in the stored file.
+
+#### Stage D2: Candidate Language Test
+
+Run a small set of Romanized Bangla development examples through each candidate model.
+
+Check whether the model:
+
+* understands the Romanized Bangla message;
+* follows the TUI/TUMI/APNI task;
+* produces the required format;
+* avoids consistently nonsensical output.
+
+This stage is only a suitability screen. It must not use test data.
+
+#### Stage D3: Matrix Smoke Test
+
+Run one development instance through all three candidate models and all three prompt conditions.
+
+This produces nine responses.
+
+Confirm that the adapters produce compatible stored records.
+
+#### Stage D4: Quota-Projection Run
+
+Run the 10-instance sample across the full model-prompt matrix.
+
+This produces 90 responses.
+
+Generate the quota and calendar-time projection.
+
+#### Stage D5: Full Development Run
+
+Complete all 810 planned development responses.
+
+Use development results to detect:
+
+* parser bugs;
+* prompt-format problems;
+* excessive invalid-output rates;
+* quota problems;
+* storage problems;
+* model-access instability;
+* resumption failures.
+
+Material changes require the affected development conditions to be regenerated.
+
+### 11.21 Test Execution Batches
+
+The test experiment will use four family-level batches.
+
+Each batch contains:
+
+* 30 complete families;
+* 90 test instances;
+* three models;
+* three prompt conditions.
+
+Each full batch therefore contains:
+
+`90 × 3 × 3 = 810 responses`
+
+The A, B, and C instances from a family must remain in the same batch.
+
+A batch may take more than one day because of free quotas.
+
+During test execution, the researcher may inspect:
+
+* completion counts;
+* API errors;
+* parsing-status counts;
+* token usage;
+* quota usage;
+* logging health.
+
+The researcher must not inspect prediction correctness and then modify later batches.
+
+### 11.22 Mandatory Stop Conditions
+
+Execution must pause if:
+
+* a provider requests payment information;
+* a paid tier is accidentally activated;
+* the account shows a financial charge;
+* a model is removed from the free tier;
+* a model identifier changes unexpectedly;
+* the projected completion period exceeds 21 days;
+* dataset or prompt hashes do not match;
+* raw outputs are not being saved;
+* request IDs are duplicated;
+* completed requests cannot be identified;
+* a provider-wide outage occurs;
+* parser unit tests fail;
+* more than 5% of development responses are invalid because of formatting;
+* test data are accidentally used during development;
+* API credentials may have been exposed.
+
+The reason, date, affected requests, and resolution must be documented before resuming.
+
+### 11.23 Prohibited Performance-Based Stopping
+
+The experiment must not be stopped because:
+
+* a model performs poorly;
+* P2 appears worse than expected;
+* preliminary findings do not support the hypothesis;
+* another model appears better;
+* early results seem uninteresting.
+
+Every frozen condition must be completed unless a documented technical, ethical, access, or quota problem makes completion impossible.
+
+### 11.24 Model Removal or Free-Tier Withdrawal
+
+If a candidate model becomes unavailable before test execution, it may be replaced and its development evaluation repeated.
+
+If a frozen model becomes unavailable after test execution begins:
+
+1. Stop the affected model condition.
+2. Preserve all existing raw outputs.
+3. Do not mix two model identities under one model label.
+4. Document the withdrawal.
+5. Select a replacement only with supervisor approval.
+6. Rerun the complete affected test condition using the replacement model.
+
+If no suitable third free model is available, reducing the experiment to two models requires:
+
+* supervisor approval;
+* a protocol amendment;
+* corresponding revision of the confirmatory comparison count;
+* disclosure in the thesis.
+
+The experiment must not make this change secretly.
+
+### 11.25 Resumption After Interruption
+
+Before resuming:
+
+1. Load the frozen run manifest.
+2. verify model availability and free-tier status;
+3. verify dataset and prompt hashes;
+4. identify completed request IDs;
+5. identify unresolved or waiting requests;
+6. verify current quota;
+7. confirm that no paid billing is active;
+8. submit only unresolved requests;
+9. append new attempts to the raw log;
+10. generate a resumption record.
+
+Completed successful requests must not be submitted again.
+
+### 11.26 Core Configuration Freeze
+
+Before test execution, freeze:
+
+* dataset version;
+* test-family IDs;
+* three model IDs;
+* model developers;
+* API hosting providers;
+* free-tier evidence;
+* recorded quota limits;
+* estimated completion period;
+* prompt files;
+* output schema;
+* parser;
+* temperature;
+* maximum output tokens;
+* retry rules;
+* batching method;
+* evaluation scripts.
+
+After approval, create:
+
+`CORE_RUN_CONFIG_FROZEN`
+
+### 11.27 Separation from the BanglaMate Extension
+
+The BanglaMate extension must also use free API access.
+
+No extension request may begin before:
+
+* all core responses are accounted for;
+* core parsing is completed;
+* core evaluation is completed;
+* primary tables are generated;
+* `CORE_RESULTS_FROZEN` is created.
+
+The extension must use:
+
+* a separate run ID;
+* a separate configuration;
+* separate raw-output storage;
+* a separate quota projection;
+* the same zero-financial-cost rule.
+
+Extension outputs must not replace or repair core outputs.
+
+### 11.28 Execution-Rule Freeze Conditions
+
+This section is ready for approval when:
+
+* three suitable free candidate models have been identified;
+* all candidates work without card information;
+* free-tier evidence has been saved;
+* quota projections are acceptable;
+* the 4,050-response matrix remains feasible;
+* API-key protection is defined;
+* retry and quota-waiting rules are approved;
+* raw-output storage is defined;
+* no frozen test request has been executed.
+
+After supervisor approval, record:
+
+`FREE_API_EXECUTION_RULES_FROZEN`
+
