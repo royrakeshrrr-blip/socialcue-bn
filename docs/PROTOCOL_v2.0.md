@@ -5202,3 +5202,559 @@ This section is ready for supervisor approval when:
 * the core-results entry gate is accepted;
 * no extension test output has been generated.
 
+## 13. Research Governance, Change Control, and Phase 1 Exit Gate
+
+### 13.1 Purpose
+
+This section defines how research decisions will be approved, changed, documented, and frozen.
+
+The purpose is to prevent:
+
+* silent changes after results are observed;
+* inconsistent instructions across documents;
+* accidental expansion of thesis scope;
+* deletion of unfavorable results;
+* confusion about which protocol version is authoritative;
+* implementation beginning before essential decisions are approved.
+
+### 13.2 Authoritative Source Order
+
+If two project documents contain conflicting instructions, use the following authority order:
+
+1. documented supervisor decision;
+2. latest supervisor-approved protocol;
+3. approved protocol amendment;
+4. thesis execution handbook;
+5. frozen configuration files;
+6. implementation notes;
+7. informal personal notes.
+
+Until the handbook is formally regenerated, the zero-cost API rules in `PROTOCOL_v2.0.md` replace any earlier handbook wording about paid APIs or monetary API budgets.
+
+A verbal supervisor decision must be written in the decision log as soon as possible.
+
+### 13.3 Change Categories
+
+Every protocol change belongs to one of four categories.
+
+#### Category A — Editorial Change
+
+Examples include:
+
+* spelling correction;
+* grammar correction;
+* formatting repair;
+* clarification that does not change the procedure;
+* correcting an incorrect file path without changing the underlying method.
+
+Editorial changes do not require a complete protocol amendment, but they must be included in normal Git history.
+
+#### Category B — Implementation-Preserving Change
+
+Examples include:
+
+* reorganizing code without changing outputs;
+* improving logging;
+* improving error messages;
+* optimizing runtime;
+* changing file organization while preserving all data and identifiers;
+* fixing a parser implementation so that it matches the already-frozen parser specification.
+
+These changes require documentation and verification tests.
+
+#### Category C — Scientific or Material Change
+
+Examples include:
+
+* changing dataset size;
+* changing family construction;
+* changing annotation labels;
+* changing annotator coverage;
+* changing development/test split;
+* changing a model;
+* changing a prompt condition;
+* changing evaluation metrics;
+* changing statistical tests;
+* changing extension conditions;
+* changing the number of agent revisions;
+* changing exclusion rules;
+* reducing the number of experimental outputs.
+
+These changes require:
+
+* a written protocol amendment;
+* supervisor approval;
+* an explanation of whether test results had already been viewed;
+* assessment of whether previous outputs must be regenerated.
+
+#### Category D — Emergency Operational Change
+
+Examples include:
+
+* API provider outage;
+* free-tier withdrawal;
+* model endpoint removal;
+* exposed API key;
+* corrupted output storage;
+* loss of internet access during a run;
+* critical implementation failure.
+
+Emergency changes require the run to pause. They must be documented before execution resumes.
+
+### 13.4 Pre-Test Changes
+
+Before frozen test outputs are generated, a material change may be made if:
+
+* the reason is documented;
+* the effect on research questions is assessed;
+* the supervisor approves it;
+* affected development experiments are repeated;
+* relevant protocol sections are updated;
+* the change log is updated;
+* a new configuration version is created.
+
+Development results may guide debugging and model suitability decisions when the protocol explicitly permits them.
+
+### 13.5 Post-Test Changes
+
+After any frozen test output has been viewed, material changes require greater caution.
+
+The amendment must state:
+
+* which test outputs were viewed;
+* why the change is necessary;
+* whether the change was motivated by performance;
+* which results are affected;
+* whether affected conditions will be rerun completely;
+* whether the analysis becomes exploratory;
+* whether the original results will still be reported.
+
+A post-test change must never be used to hide an unfavorable result.
+
+### 13.6 Prohibited Silent Changes
+
+The following are prohibited:
+
+* changing prompts without updating their version;
+* replacing model outputs manually;
+* deleting invalid outputs;
+* selecting a second response because it is more accurate;
+* changing labels after seeing model predictions;
+* moving families between development and test;
+* excluding difficult cases without applying the frozen rule;
+* reporting only favorable metrics;
+* adding agent conditions after reviewing extension results;
+* mixing two model versions under one model name.
+
+### 13.7 Required Change-Log Fields
+
+Every material change-log entry must include:
+
+* change ID;
+* date;
+* protocol version;
+* requested by;
+* category;
+* affected files or sections;
+* old rule;
+* proposed or implemented rule;
+* reason;
+* whether development results were viewed;
+* whether test results were viewed;
+* supervisor decision;
+* required reruns;
+* completion status;
+* relevant Git commit.
+
+The change log is append-only. Previous entries must not be deleted.
+
+### 13.8 Protocol Version Status
+
+The current protocol status is:
+
+`v2.0-DRAFT`
+
+It must not be described as approved until the supervisor has reviewed the approval package.
+
+After approval without material changes, the status becomes:
+
+`v2.0-APPROVED`
+
+If material revisions are requested before approval, create:
+
+`v2.1-DRAFT`
+
+Do not overwrite an approved version silently.
+
+### 13.9 Required Supervisor Decisions
+
+The supervisor must explicitly review:
+
+* narrowed core thesis problem;
+* controlled counterfactual design;
+* 150-family and 450-instance dataset size;
+* TUI/TUMI/APNI label design;
+* primary and acceptable register labels;
+* two-annotator reduced-coverage plan;
+* 30-family development and 120-family test split;
+* three-model and three-prompt core matrix;
+* 4,050 core-response total;
+* family-clustered statistical plan;
+* zero-cost free-API-only constraint;
+* model-replacement contingency;
+* secondary four-agent BanglaMate extension;
+* extension entry gate;
+* extension 90-case limit;
+* maximum one Critic-triggered revision;
+* small extension human evaluation;
+* final scope exclusions.
+
+### 13.10 Phase 1 Required Files
+
+Phase 1 requires:
+
+* `docs/PROTOCOL_v2.0.md`
+* `docs/PIVOT_JUSTIFICATION.md`
+* `docs/SUPERVISOR_APPROVAL_CHECKLIST.md`
+* `docs/CHANGE_LOG.md`
+
+All four files must be committed and pushed.
+
+### 13.11 Work Permitted While Awaiting Approval
+
+While waiting for supervisor approval, the researcher may:
+
+* collect academic literature;
+* organize references;
+* read related papers;
+* prepare proposal-writing notes;
+* inspect free API account requirements without running test cases;
+* create empty templates;
+* improve Git familiarity;
+* correct editorial errors.
+
+The researcher must not:
+
+* create the final dataset;
+* annotate final cases;
+* freeze the split;
+* generate test outputs;
+* run the agent extension;
+* describe the draft protocol as approved.
+
+### 13.12 Phase 1 Exit Gate
+
+Phase 1 is complete only when:
+
+* all protocol sections have been written;
+* the pivot justification has been written;
+* the approval checklist has been reviewed;
+* the change log exists;
+* all four documents are pushed to GitHub;
+* the supervisor approves the narrowed core scope;
+* the supervisor accepts or rejects the extension explicitly;
+* requested protocol corrections are completed;
+* approval evidence is recorded;
+* the approved protocol version is committed;
+* the Phase 1 completion milestone is created.
+
+After all conditions are satisfied, create:
+
+`PHASE1_PROTOCOL_APPROVED`
+
+Until then, the project status is:
+
+`PHASE1_AWAITING_APPROVAL`
+
+### 13.13 Phase 1 Failure or Revision Route
+
+If the supervisor rejects part of the design:
+
+1. Do not delete the current draft.
+2. Record the feedback.
+3. Add a change-log entry.
+4. Create the next draft version.
+5. Modify only the affected sections.
+6. Recheck all downstream dependencies.
+7. resubmit the revised approval package.
+8. Wait for approval before irreversible work.
+
+Supervisor criticism is treated as a revision request, not as permission to make undocumented changes.
+## 13. Research Governance, Change Control, and Phase 1 Exit Gate
+
+### 13.1 Purpose
+
+This section defines how research decisions will be approved, changed, documented, and frozen.
+
+The purpose is to prevent:
+
+* silent changes after results are observed;
+* inconsistent instructions across documents;
+* accidental expansion of thesis scope;
+* deletion of unfavorable results;
+* confusion about which protocol version is authoritative;
+* implementation beginning before essential decisions are approved.
+
+### 13.2 Authoritative Source Order
+
+If two project documents contain conflicting instructions, use the following authority order:
+
+1. documented supervisor decision;
+2. latest supervisor-approved protocol;
+3. approved protocol amendment;
+4. thesis execution handbook;
+5. frozen configuration files;
+6. implementation notes;
+7. informal personal notes.
+
+Until the handbook is formally regenerated, the zero-cost API rules in `PROTOCOL_v2.0.md` replace any earlier handbook wording about paid APIs or monetary API budgets.
+
+A verbal supervisor decision must be written in the decision log as soon as possible.
+
+### 13.3 Change Categories
+
+Every protocol change belongs to one of four categories.
+
+#### Category A — Editorial Change
+
+Examples include:
+
+* spelling correction;
+* grammar correction;
+* formatting repair;
+* clarification that does not change the procedure;
+* correcting an incorrect file path without changing the underlying method.
+
+Editorial changes do not require a complete protocol amendment, but they must be included in normal Git history.
+
+#### Category B — Implementation-Preserving Change
+
+Examples include:
+
+* reorganizing code without changing outputs;
+* improving logging;
+* improving error messages;
+* optimizing runtime;
+* changing file organization while preserving all data and identifiers;
+* fixing a parser implementation so that it matches the already-frozen parser specification.
+
+These changes require documentation and verification tests.
+
+#### Category C — Scientific or Material Change
+
+Examples include:
+
+* changing dataset size;
+* changing family construction;
+* changing annotation labels;
+* changing annotator coverage;
+* changing development/test split;
+* changing a model;
+* changing a prompt condition;
+* changing evaluation metrics;
+* changing statistical tests;
+* changing extension conditions;
+* changing the number of agent revisions;
+* changing exclusion rules;
+* reducing the number of experimental outputs.
+
+These changes require:
+
+* a written protocol amendment;
+* supervisor approval;
+* an explanation of whether test results had already been viewed;
+* assessment of whether previous outputs must be regenerated.
+
+#### Category D — Emergency Operational Change
+
+Examples include:
+
+* API provider outage;
+* free-tier withdrawal;
+* model endpoint removal;
+* exposed API key;
+* corrupted output storage;
+* loss of internet access during a run;
+* critical implementation failure.
+
+Emergency changes require the run to pause. They must be documented before execution resumes.
+
+### 13.4 Pre-Test Changes
+
+Before frozen test outputs are generated, a material change may be made if:
+
+* the reason is documented;
+* the effect on research questions is assessed;
+* the supervisor approves it;
+* affected development experiments are repeated;
+* relevant protocol sections are updated;
+* the change log is updated;
+* a new configuration version is created.
+
+Development results may guide debugging and model suitability decisions when the protocol explicitly permits them.
+
+### 13.5 Post-Test Changes
+
+After any frozen test output has been viewed, material changes require greater caution.
+
+The amendment must state:
+
+* which test outputs were viewed;
+* why the change is necessary;
+* whether the change was motivated by performance;
+* which results are affected;
+* whether affected conditions will be rerun completely;
+* whether the analysis becomes exploratory;
+* whether the original results will still be reported.
+
+A post-test change must never be used to hide an unfavorable result.
+
+### 13.6 Prohibited Silent Changes
+
+The following are prohibited:
+
+* changing prompts without updating their version;
+* replacing model outputs manually;
+* deleting invalid outputs;
+* selecting a second response because it is more accurate;
+* changing labels after seeing model predictions;
+* moving families between development and test;
+* excluding difficult cases without applying the frozen rule;
+* reporting only favorable metrics;
+* adding agent conditions after reviewing extension results;
+* mixing two model versions under one model name.
+
+### 13.7 Required Change-Log Fields
+
+Every material change-log entry must include:
+
+* change ID;
+* date;
+* protocol version;
+* requested by;
+* category;
+* affected files or sections;
+* old rule;
+* proposed or implemented rule;
+* reason;
+* whether development results were viewed;
+* whether test results were viewed;
+* supervisor decision;
+* required reruns;
+* completion status;
+* relevant Git commit.
+
+The change log is append-only. Previous entries must not be deleted.
+
+### 13.8 Protocol Version Status
+
+The current protocol status is:
+
+`v2.0-DRAFT`
+
+It must not be described as approved until the supervisor has reviewed the approval package.
+
+After approval without material changes, the status becomes:
+
+`v2.0-APPROVED`
+
+If material revisions are requested before approval, create:
+
+`v2.1-DRAFT`
+
+Do not overwrite an approved version silently.
+
+### 13.9 Required Supervisor Decisions
+
+The supervisor must explicitly review:
+
+* narrowed core thesis problem;
+* controlled counterfactual design;
+* 150-family and 450-instance dataset size;
+* TUI/TUMI/APNI label design;
+* primary and acceptable register labels;
+* two-annotator reduced-coverage plan;
+* 30-family development and 120-family test split;
+* three-model and three-prompt core matrix;
+* 4,050 core-response total;
+* family-clustered statistical plan;
+* zero-cost free-API-only constraint;
+* model-replacement contingency;
+* secondary four-agent BanglaMate extension;
+* extension entry gate;
+* extension 90-case limit;
+* maximum one Critic-triggered revision;
+* small extension human evaluation;
+* final scope exclusions.
+
+### 13.10 Phase 1 Required Files
+
+Phase 1 requires:
+
+* `docs/PROTOCOL_v2.0.md`
+* `docs/PIVOT_JUSTIFICATION.md`
+* `docs/SUPERVISOR_APPROVAL_CHECKLIST.md`
+* `docs/CHANGE_LOG.md`
+
+All four files must be committed and pushed.
+
+### 13.11 Work Permitted While Awaiting Approval
+
+While waiting for supervisor approval, the researcher may:
+
+* collect academic literature;
+* organize references;
+* read related papers;
+* prepare proposal-writing notes;
+* inspect free API account requirements without running test cases;
+* create empty templates;
+* improve Git familiarity;
+* correct editorial errors.
+
+The researcher must not:
+
+* create the final dataset;
+* annotate final cases;
+* freeze the split;
+* generate test outputs;
+* run the agent extension;
+* describe the draft protocol as approved.
+
+### 13.12 Phase 1 Exit Gate
+
+Phase 1 is complete only when:
+
+* all protocol sections have been written;
+* the pivot justification has been written;
+* the approval checklist has been reviewed;
+* the change log exists;
+* all four documents are pushed to GitHub;
+* the supervisor approves the narrowed core scope;
+* the supervisor accepts or rejects the extension explicitly;
+* requested protocol corrections are completed;
+* approval evidence is recorded;
+* the approved protocol version is committed;
+* the Phase 1 completion milestone is created.
+
+After all conditions are satisfied, create:
+
+`PHASE1_PROTOCOL_APPROVED`
+
+Until then, the project status is:
+
+`PHASE1_AWAITING_APPROVAL`
+
+### 13.13 Phase 1 Failure or Revision Route
+
+If the supervisor rejects part of the design:
+
+1. Do not delete the current draft.
+2. Record the feedback.
+3. Add a change-log entry.
+4. Create the next draft version.
+5. Modify only the affected sections.
+6. Recheck all downstream dependencies.
+7. resubmit the revised approval package.
+8. Wait for approval before irreversible work.
+
+Supervisor criticism is treated as a revision request, not as permission to make undocumented changes.
