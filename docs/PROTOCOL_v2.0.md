@@ -599,3 +599,231 @@ An instance passes context-variable validation only when:
 - Variant A uses `changed_cue_from_A = NONE`.
 - Variants B and C record valid and different changed cues.
 - Each controlled comparison changes exactly one social cue.
+
+### 4.9 Acceptable register set
+
+The acceptable register set will be created automatically from the annotation.
+
+Example 1:
+
+```text
+primary_register = APNI
+secondary_register = NONE
+acceptable_registers = [APNI]
+```
+
+Example 2:
+
+```text
+primary_register = TUMI
+secondary_register = APNI
+acceptable_registers = [TUMI, APNI]
+```
+
+A model prediction will count as acceptable-set correct if it belongs to the
+approved acceptable-register set.
+
+Primary-label accuracy and acceptable-set accuracy will be reported
+separately.
+
+### 4.10 Confidence
+
+Field name:
+
+`confidence`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `HIGH` | The annotator is confident that the decision is appropriate |
+| `MEDIUM` | The decision is reasonable, but some social variation is possible |
+| `LOW` | Important uncertainty remains and the instance should be reviewed |
+
+Confidence does not replace the primary register.
+
+For example, the following is invalid:
+
+```text
+primary_register = UNSURE
+```
+
+The correct approach is:
+
+```text
+primary_register = TUMI
+confidence = LOW
+```
+
+If the scenario cannot reasonably be answered, the annotator should use the
+appropriate answerability status instead of forcing a register label.
+
+### 4.11 Answerability status
+
+Field name:
+
+`answerability_status`
+
+Allowed values:
+
+| Value | Meaning |
+|---|---|
+| `ANSWERABLE` | Enough consistent context exists to choose a register |
+| `UNDERSPECIFIED` | Important information is missing |
+| `CONTRADICTORY` | Context fields conflict with one another |
+| `CULTURALLY_CONTENTIOUS` | Genuine cultural or social disagreement is likely |
+| `EXCLUDE` | The instance is unsuitable for the benchmark |
+
+Rules:
+
+- `ANSWERABLE` instances must have a primary register.
+- Non-answerable instances may leave the primary register blank temporarily.
+- Non-answerable instances must contain a short explanatory note.
+- Every non-answerable instance must be reviewed before dataset freeze.
+- An instance must not enter the final test set without a resolved decision.
+- Structurally weak instances should be rewritten or excluded rather than
+  receiving an artificial gold label.
+
+### 4.12 Reason codes
+
+Field name:
+
+`reason_codes`
+
+One or more of the following values may be selected:
+
+| Code | Meaning |
+|---|---|
+| `AUTHORITY` | Authority difference influenced the decision |
+| `AGE` | Relative age influenced the decision |
+| `FAMILIARITY` | Personal familiarity influenced the decision |
+| `SETTING` | Communication setting influenced the decision |
+| `KINSHIP` | Family or kinship relationship influenced the decision |
+| `ROLE` | Speaker or recipient role influenced the decision |
+| `EMOTIONAL_STANCE` | Affection, anger, distance or another emotional factor influenced the decision |
+| `MESSAGE_FORM` | Existing wording of the message influenced the interpretation |
+| `MISSING_CONTEXT` | Necessary contextual information is absent |
+| `CONTRADICTION` | Context fields conflict |
+| `CULTURAL_VARIATION` | Multiple interpretations may reflect genuine cultural variation |
+| `OTHER` | Another documented reason influenced the decision |
+
+If `OTHER` is selected, a short note is required.
+
+Reason codes provide short, auditable evidence. Annotators should not normally
+write long free-text explanations.
+
+### 4.13 Short annotation note
+
+Field name:
+
+`annotation_note`
+
+A short note is optional for ordinary high-confidence answerable cases.
+
+A note is required when:
+
+- Confidence is `LOW`.
+- Answerability is not `ANSWERABLE`.
+- `OTHER` is selected as a reason code.
+- The annotator identifies a possible error.
+- The context contains an unusual relationship.
+- The secondary register needs clarification.
+
+The note should explain the uncertainty briefly without including private or
+personally identifying information.
+
+### 4.14 Source register versus annotated register
+
+The following fields have different meanings:
+
+| Field | Meaning |
+|---|---|
+| `source_register` | Register form already present in the original Romanized message |
+| `primary_register` | Register judged most appropriate for the described social context |
+| `secondary_register` | Another register that is also acceptable |
+
+These fields may differ.
+
+Example:
+
+```text
+source_register = APNI
+primary_register = TUMI
+secondary_register = NONE
+```
+
+This means that the original message uses an Apni-style form, but the human
+annotator believes Tumi is more appropriate for the supplied context.
+
+This difference is important because the study will measure whether models
+use social context or merely copy the message's existing register.
+
+### 4.15 Required annotation fields
+
+Every annotation record must contain:
+
+| Field | Required? |
+|---|---|
+| `instance_id` | Yes |
+| `annotator_id` | Yes |
+| `primary_register` | Yes when answerable |
+| `secondary_register` | Yes; use NONE when absent |
+| `confidence` | Yes |
+| `answerability_status` | Yes |
+| `reason_codes` | Yes |
+| `annotation_note` | Required for flagged cases |
+| `annotation_guide_version` | Yes |
+| `annotation_timestamp` | Yes |
+
+Annotator identities will use non-identifying codes such as:
+
+- `ANN_A`
+- `ANN_B`
+- `ADJUDICATOR`
+
+Personal names should not be placed in the public or shareable dataset.
+
+### 4.16 Example annotation record
+
+Example context:
+
+- Speaker is a university student.
+- Recipient has higher authority.
+- Recipient is older.
+- Familiarity is low.
+- Setting is formal.
+
+Example annotation:
+
+```text
+instance_id = F025-B
+annotator_id = ANN_A
+primary_register = APNI
+secondary_register = NONE
+confidence = HIGH
+answerability_status = ANSWERABLE
+reason_codes = [AUTHORITY, AGE, SETTING]
+annotation_note =
+annotation_guide_version = 1.0
+annotation_timestamp = YYYY-MM-DD HH:MM
+```
+
+This is an illustrative example only. It will not be used as a benchmark
+instance or model demonstration.
+
+### 4.17 Annotation validation rules
+
+An annotation passes basic validation only when:
+
+- `annotator_id` exists.
+- The answerability value belongs to the approved list.
+- Every answerable instance has one primary register.
+- The primary register is TUI, TUMI or APNI.
+- The secondary register is valid or NONE.
+- Primary and secondary registers are different.
+- A maximum of one secondary register is selected.
+- Confidence is HIGH, MEDIUM or LOW.
+- At least one reason code is present.
+- A note exists whenever the protocol requires one.
+- The annotation guide version is recorded.
+- The timestamp is recorded.
