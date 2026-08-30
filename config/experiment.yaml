@@ -22,6 +22,10 @@ generation:
 prompts:
   core_version: "0.1-DRAFT"
   extension_version: "0.1-DRAFT"
+  core_conditions:
+    - "P0_MESSAGE_ONLY"
+    - "P1_NATURAL_CONTEXT"
+    - "P2_STRUCTURED_CONTEXT"
 
 model:
   adapter: "dummy"
