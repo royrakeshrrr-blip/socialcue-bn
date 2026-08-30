@@ -827,3 +827,374 @@ An annotation passes basic validation only when:
 - A note exists whenever the protocol requires one.
 - The annotation guide version is recorded.
 - The timestamp is recorded.
+
+## 5. Instance Review, Revision, and Exclusion Rules
+
+### 5.1 Purpose
+
+Every candidate dataset instance must be reviewed before it enters the frozen
+benchmark.
+
+An instance must not be retained merely because it supports the researcher's
+expected Tui, Tumi or Apni label.
+
+If the supplied context does not support a reliable decision, the instance
+must be revised, adjudicated or excluded.
+
+### 5.2 Answerability status versus review action
+
+The following fields serve different purposes:
+
+| Field | Meaning |
+|---|---|
+| `answerability_status` | Annotator's judgment about whether the instance can be answered |
+| `review_action` | Researcher's documented decision about what to do with the instance |
+
+Allowed `review_action` values are:
+
+| Value | Meaning |
+|---|---|
+| `KEEP` | Instance is valid and may remain in the dataset |
+| `REVISE` | Instance requires correction and revalidation |
+| `ADJUDICATE` | Instance requires another qualified review |
+| `EXCLUDE` | Instance will not enter the final benchmark |
+
+`ADJUDICATE` is a temporary action. After adjudication, the final action must
+be `KEEP`, `REVISE` or `EXCLUDE`.
+
+### 5.3 Structural problems
+
+An instance or message family must be revised when:
+
+- The family does not contain exactly three instances.
+- An instance ID is missing or duplicated.
+- A message-family ID is missing or duplicated.
+- A, B and C do not use exactly the same Romanized message.
+- Variant B changes more than one cue from A.
+- Variant C changes more than one cue from A.
+- B and C change the same cue from A.
+- `changed_cue_from_A` does not match the actual changed field.
+- A categorical value does not belong to the approved list.
+- A required field is blank.
+- Comparison IDs refer to nonexistent instances.
+
+If a structural error cannot be corrected without redesigning the family,
+the complete family must be excluded.
+
+### 5.4 Underspecified context
+
+Use:
+
+`answerability_status = UNDERSPECIFIED`
+
+when important information required for the register decision is missing.
+
+Examples include:
+
+- The relationship between speaker and recipient is unclear.
+- Authority information is missing.
+- Familiarity is not described sufficiently.
+- The setting cannot be determined.
+- A family relationship is mentioned without enough information about closeness.
+- The decision depends on information that exists only in the researcher's mind.
+
+Recommended action:
+
+1. Identify the missing information.
+2. Add only the minimum necessary contextual information.
+3. Confirm that the correction does not change an unintended cue.
+4. Revalidate all three instances in the family.
+5. Send the revised instance for fresh annotation.
+
+Do not use a secondary acceptable label merely to hide missing context.
+
+### 5.5 Contradictory context
+
+Use:
+
+`answerability_status = CONTRADICTORY`
+
+when two or more parts of the context conflict.
+
+Examples include:
+
+- The recipient is described as both younger and older.
+- The recipient is described as a stranger but familiarity is `HIGH`.
+- The setting is described as an official hearing but marked `INFORMAL`.
+- The narrative says the recipient is the speaker's supervisor while
+  `authority_relation = LOWER`.
+- The changed-cue field says `AGE`, but authority is the field that changed.
+
+Recommended action:
+
+1. Identify the conflicting fields.
+2. Determine whether the contradiction is a data-entry error.
+3. Correct the error only when the intended context is clear.
+4. Record the original and corrected values.
+5. Revalidate the complete family.
+6. Exclude the family if the intended context cannot be recovered.
+
+### 5.6 Culturally contentious cases
+
+Use:
+
+`answerability_status = CULTURALLY_CONTENTIOUS`
+
+when the context is complete and consistent but qualified native speakers
+may reasonably disagree because of genuine social or cultural variation.
+
+Examples may include:
+
+- Tui versus Tumi between close siblings.
+- Tumi versus Apni between familiar colleagues of different ages.
+- Register choice involving regional or family-specific norms.
+- Relationships where affection and hierarchy provide conflicting signals.
+
+Recommended action:
+
+1. Request independent review from another qualified native Bangla speaker.
+2. Record the competing interpretations.
+3. Determine whether one register is preferable and another is acceptable.
+4. Use the optional secondary register when both are genuinely acceptable.
+5. Keep the case only when its ambiguity can be represented transparently.
+6. Exclude it from the primary analysis if no defensible interpretation can
+   be established.
+7. Optionally archive it as an exploratory example.
+
+Cultural disagreement must not automatically be treated as annotation failure.
+
+### 5.7 Linguistic naturalness
+
+A candidate must be revised or excluded when:
+
+- The Romanized Bangla is not understandable.
+- The wording appears machine-translated.
+- The message uses an unrealistic sentence structure.
+- The wording is unnecessarily long or artificial.
+- It contains an unnatural mixture of formal and intimate forms.
+- It requires hidden background information.
+- It contains obvious placeholder text.
+- It does not resemble a plausible digital message.
+
+Minor natural Romanized spelling variation is permitted.
+
+The researcher must not silently convert every message into standardized
+Bangla spelling. Natural variation may be preserved when the meaning remains
+clear.
+
+A native Bangla speaker who did not draft the candidate messages should
+review a sample for naturalness.
+
+### 5.8 Code-mixing rules
+
+The message must remain primarily Romanized Bangla.
+
+Use the following code-mixing levels:
+
+| English lexical-token proportion | `code_mix_level` |
+|---|---|
+| 0%–5% | `NONE` |
+| Above 5%–15% | `LIGHT` |
+| Above 15%–30% | `MODERATE` |
+| Above 30% | `REVIEW_OR_EXCLUDE` |
+
+Rules:
+
+- A complete English clause should normally be revised or excluded.
+- Common technical terms may remain when they are natural in the domain.
+- Any exception above the 30% limit must be documented before annotation.
+- The same message must have the same English-token ratio in A, B and C.
+- Code-mixing must not be silently corrected after annotation.
+- Code-mixing level must be recorded for later analysis.
+
+Example of a potentially acceptable technical term:
+
+```text
+assignment ta submit kora hoyeche?
+```
+
+Example requiring review:
+
+```text
+Could you please submit the assignment before tomorrow?
+```
+
+The second example is primarily English rather than Romanized Bangla.
+
+### 5.9 Privacy and ethical exclusion
+
+A candidate must be revised or excluded when it contains:
+
+- A real private person's full name.
+- A private phone number.
+- A private email address.
+- A private home address.
+- A student ID, employee ID or account number.
+- A copied private conversation without consent.
+- Confidential academic, medical or workplace information.
+- Information that could identify an annotator.
+- Harmful personal allegations.
+- Unnecessary sensitive personal information.
+
+Use role-based or fictional descriptions instead.
+
+Examples:
+
+| Unsafe content | Safer replacement |
+|---|---|
+| Real teacher's full name | `TEACHER` or a fictional name |
+| Real phone number | Remove the number |
+| Exact private workplace issue | Use a fictional professional scenario |
+| Annotator's real name | `ANN_A` or `ANN_B` |
+
+A private GitHub repository does not remove the responsibility to protect
+personal information.
+
+### 5.10 Duplicate and template-like content
+
+A candidate must be reviewed when:
+
+- Its message is identical to another family's message.
+- Its context is nearly identical to another family.
+- Only one or two words distinguish many candidate messages.
+- AI-generated candidates repeatedly use the same sentence structure.
+- One domain or communicative intention appears too frequently.
+- Multiple examples test effectively the same social contrast.
+
+Use exact-text and approximate-duplicate checking before dataset freeze.
+
+When duplicates are detected:
+
+1. Keep the clearer and more natural family.
+2. Rewrite the weaker family into a genuinely different scenario.
+3. Exclude it if a meaningful distinction cannot be created.
+
+### 5.11 Stereotype and label-obviousness review
+
+A candidate must be revised or excluded when:
+
+- It relies on gender, class, occupation, age or regional stereotypes.
+- It suggests that every older person must receive Apni.
+- It suggests that every younger person must receive Tui.
+- It makes the expected label obvious through an artificial description.
+- It is designed only to force the researcher's preferred result.
+- It portrays a social group unnecessarily negatively.
+- Its expected answer depends on offensive or harmful assumptions.
+
+The context should provide relevant social information without directly
+telling the annotator which register to select.
+
+Invalid example:
+
+```text
+The recipient is very respected, so the speaker must use Apni.
+```
+
+Better approach:
+
+```text
+The recipient has higher institutional authority, familiarity is low,
+and the communication occurs in a formal setting.
+```
+
+The second version supplies context without directly revealing the label.
+
+### 5.12 Revision record
+
+Every material revision must be documented.
+
+The revision record should contain:
+
+| Field | Meaning |
+|---|---|
+| `issue_id` | Unique issue identifier |
+| `message_family_id` | Affected family |
+| `instance_id` | Affected instance or ALL |
+| `issue_type` | Structural, linguistic, privacy, ambiguity, duplicate, etc. |
+| `detected_by` | Validator, researcher, annotator or reviewer |
+| `original_value` | Value before revision |
+| `revised_value` | Value after revision |
+| `revision_reason` | Why the change was necessary |
+| `review_action` | KEEP, REVISE, ADJUDICATE or EXCLUDE |
+| `reviewer_id` | Person who approved the action |
+| `review_timestamp` | Date and time |
+| `requires_reannotation` | YES or NO |
+
+No material revision may be performed without a record.
+
+### 5.13 Family-level revision rule
+
+The message family is the main counterfactual unit.
+
+Therefore, when any instance in a family changes:
+
+1. Recheck all three instance IDs.
+2. Recheck message identity across A, B and C.
+3. Recalculate which fields differ.
+4. Revalidate A-B.
+5. Revalidate A-C.
+6. Recalculate code-mixing information if the message changed.
+7. Review the source-register value.
+8. Determine whether previous annotations are still valid.
+9. Reannotate the complete affected family when the message or social
+   interpretation changes.
+
+Do not repair only one row and assume the remaining family is still valid.
+
+### 5.14 Timing of revisions
+
+Before annotation freeze:
+
+- Structural and linguistic problems may be corrected.
+- Corrections must be logged.
+- Materially changed cases must be reannotated.
+
+After dataset freeze:
+
+- The frozen dataset must not be silently changed.
+- A correction requires a new dataset version.
+- The reason and affected results must be documented.
+- Checksums and split files must be regenerated.
+- The supervisor must approve major changes.
+
+After inspecting test results:
+
+- Do not revise cases merely because a model performed poorly.
+- Do not remove difficult cases merely to improve accuracy.
+- A genuine data error may be corrected only through a documented amendment.
+- The affected analysis must be labelled appropriately.
+
+### 5.15 Example review decisions
+
+| Situation | Answerability | Review action |
+|---|---|---|
+| One required context field is missing | UNDERSPECIFIED | REVISE |
+| Narrative and structured fields conflict | CONTRADICTORY | REVISE |
+| Two registers are genuinely acceptable | ANSWERABLE or CULTURALLY_CONTENTIOUS | ADJUDICATE |
+| Message contains a real phone number | EXCLUDE temporarily | REVISE or EXCLUDE |
+| Message differs between A, B and C | Not applicable | REVISE |
+| More than one cue changes from A | Not applicable | REVISE |
+| Primarily English message | EXCLUDE | REVISE or EXCLUDE |
+| Serious unresolved cultural disagreement | CULTURALLY_CONTENTIOUS | EXCLUDE from primary analysis |
+| Natural minor Romanized spelling variation | ANSWERABLE | KEEP |
+| Model gives an incorrect answer | Not a dataset problem | KEEP |
+
+A model error is not automatically evidence that the dataset instance is
+incorrect.
+
+### 5.16 Final instance acceptance checklist
+
+An instance may enter the final benchmark only when:
+
+- It passes structural validation.
+- Its context is sufficiently specified.
+- Its fields do not contradict one another.
+- Its Romanized Bangla is understandable and natural.
+- It follows the code-mixing rule.
+- It contains no private information.
+- It is not an unjustified duplicate.
+- It does not rely on harmful stereotypes.
+- Its family retains one-cue counterfactual control.
+- Required revisions are documented.
+- Required reannotation is complete.
+- Its final review action is `KEEP`.
