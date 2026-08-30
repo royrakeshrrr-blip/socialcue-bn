@@ -1,0 +1,26 @@
+# Numerical and tabular data processing
+numpy
+pandas
+
+# Statistical analysis and evaluation
+scipy
+scikit-learn
+statsmodels
+
+# Figures and visualizations
+matplotlib
+seaborn
+
+# Dataset schema validation
+pydantic>=2
+
+# Configuration files and environment variables
+PyYAML
+python-dotenv
+
+# Experiment progress and retry handling
+tqdm
+tenacity
+
+# Automated testing
+pytest
