@@ -2656,3 +2656,752 @@ The core prompt and model configuration is frozen only when:
 
 After this freeze, prompt or model changes require a new experiment name and
 documented change classification.
+
+## 9. Core Evaluation Metrics
+
+### 9.1 Evaluation principle
+
+Every core model and prompt condition will be evaluated using the same frozen
+test instances and the same metric definitions.
+
+Metrics must be defined before test outputs are inspected.
+
+The researcher must not:
+
+- Change a metric because the result is disappointing.
+- Remove incorrect model responses.
+- Exclude difficult test cases after seeing model performance.
+- Treat invalid outputs as missing data.
+- Select only favorable domains or cue types.
+- Report only the best-performing metric.
+
+Development results and test results must be reported separately.
+
+### 9.2 Evaluation inventory
+
+The frozen test set contains:
+
+```text
+120 message families
+360 instances
+240 controlled comparisons
+```
+
+Each test family produces two controlled comparisons:
+
+- A compared with B
+- A compared with C
+
+Therefore:
+
+```text
+120 families × 2 comparisons = 240 test comparisons
+```
+
+Each model-prompt configuration should produce:
+
+```text
+360 instance-level predictions
+240 controlled-pair evaluations
+```
+
+There are nine primary configurations:
+
+```text
+3 models × 3 prompt conditions = 9 configurations
+```
+
+### 9.3 Register ordering
+
+For directional analysis, the registers will use the following ordered
+representation:
+
+| Register | Numerical level |
+|---|---:|
+| `TUI` | 0 |
+| `TUMI` | 1 |
+| `APNI` | 2 |
+
+These numbers represent relative register level only.
+
+They do not imply that one register is linguistically or morally better than
+another.
+
+### 9.4 Primary-label accuracy
+
+Primary-label accuracy measures whether the model prediction exactly matches
+the human gold primary register.
+
+Formula:
+
+```text
+Primary-label accuracy =
+Number of predictions matching the gold primary register
+÷
+Number of evaluated instances
+```
+
+Example:
+
+```text
+Gold primary register = TUMI
+Model prediction = TUMI
+Result = Correct
+```
+
+Example:
+
+```text
+Gold primary register = TUMI
+Model prediction = APNI
+Result = Incorrect
+```
+
+Even if Apni is listed as an acceptable secondary register, it does not count
+as primary-label correct.
+
+Primary-label accuracy will therefore be stricter than acceptable-set
+accuracy.
+
+### 9.5 Acceptable-set accuracy
+
+Acceptable-set accuracy measures whether the model prediction belongs to the
+complete approved acceptable-register set.
+
+Formula:
+
+```text
+Acceptable-set accuracy =
+Number of predictions belonging to the gold acceptable set
+÷
+Number of evaluated instances
+```
+
+Example 1:
+
+```text
+Gold primary = TUMI
+Gold secondary = NONE
+Acceptable set = [TUMI]
+Model prediction = APNI
+Result = Incorrect
+```
+
+Example 2:
+
+```text
+Gold primary = TUMI
+Gold secondary = APNI
+Acceptable set = [TUMI, APNI]
+Model prediction = APNI
+Result = Correct
+```
+
+Acceptable-set accuracy is the main instance-level metric because it respects
+documented sociolinguistic variation.
+
+### 9.6 Per-class precision, recall and F1
+
+Precision, recall and F1 will be calculated separately for:
+
+- Tui
+- Tumi
+- Apni
+
+Precision asks:
+
+> When the model predicts this register, how often is the primary label the
+> same?
+
+Recall asks:
+
+> Of all instances whose primary label is this register, how many did the
+> model identify?
+
+F1 combines precision and recall.
+
+The result table must report:
+
+| Label | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| TUI | Value | Value | Value | Number of gold Tui cases |
+| TUMI | Value | Value | Value | Number of gold Tumi cases |
+| APNI | Value | Value | Value | Number of gold Apni cases |
+
+### 9.7 Macro-F1
+
+Macro-F1 gives equal importance to Tui, Tumi and Apni.
+
+Formula:
+
+```text
+Macro-F1 =
+(F1 for TUI + F1 for TUMI + F1 for APNI)
+÷ 3
+```
+
+Macro-F1 is necessary because ordinary accuracy may hide poor performance on
+a less frequent label.
+
+Example:
+
+A model may achieve high accuracy by predicting Tumi frequently while
+performing poorly on Tui.
+
+Macro-F1 reduces the advantage of relying only on the most common label.
+
+### 9.8 Confusion matrix
+
+A confusion matrix will show how often each gold primary label is predicted
+as each output label.
+
+Required columns:
+
+- Predicted Tui
+- Predicted Tumi
+- Predicted Apni
+- Invalid output
+
+Required rows:
+
+- Gold Tui
+- Gold Tumi
+- Gold Apni
+
+The confusion matrix will help identify patterns such as:
+
+- Tui repeatedly predicted as Tumi.
+- Tumi repeatedly predicted as Apni.
+- Apni repeatedly predicted as Tumi.
+- One label producing more invalid outputs.
+
+A confusion matrix must be generated for every model-prompt configuration.
+
+### 9.9 Invalid-output treatment
+
+After all permitted technical retries are exhausted, an invalid output must
+remain in the experiment record.
+
+Invalid outputs include:
+
+- Empty responses.
+- Invalid JSON that cannot be recovered.
+- Missing register.
+- Illegal register value.
+- Blocked response.
+- Unresolved provider failure.
+- Output that cannot be parsed under the frozen rules.
+
+For primary-label and acceptable-set accuracy:
+
+```text
+Invalid output = Incorrect prediction
+```
+
+Invalid outputs must not be removed from the denominator.
+
+For three-class F1 calculations:
+
+- Invalid outputs contribute a false negative to the true class.
+- Invalid outputs are retained as an additional confusion-matrix column.
+- F1 is calculated and reported for Tui, Tumi and Apni.
+- Invalid-output rate is reported separately.
+
+Formula:
+
+```text
+Invalid-output rate =
+Number of unresolved invalid outputs
+÷
+Number of planned responses
+```
+
+### 9.10 Pairwise acceptable accuracy
+
+A controlled comparison is pairwise acceptable only when both predictions
+are acceptable for their respective instances.
+
+For A-B:
+
+```text
+Prediction A must belong to acceptable set A
+AND
+Prediction B must belong to acceptable set B
+```
+
+The same rule applies to A-C.
+
+Formula:
+
+```text
+Pairwise acceptable accuracy =
+Number of controlled pairs where both outputs are acceptable
+÷
+Number of evaluated controlled pairs
+```
+
+This metric is stricter than ordinary instance-level accuracy.
+
+### 9.11 Gold counterfactual direction
+
+For each controlled comparison, calculate the direction of the gold primary
+register change.
+
+Use:
+
+```text
+TUI = 0
+TUMI = 1
+APNI = 2
+```
+
+Then calculate:
+
+```text
+gold_direction =
+sign(gold_register_X - gold_register_A)
+```
+
+where X is B or C.
+
+Possible values:
+
+| Direction | Meaning |
+|---|---|
+| `-1` | Gold register moves downward |
+| `0` | Gold primary register remains the same |
+| `+1` | Gold register moves upward |
+
+Example:
+
+```text
+Gold A = TUMI = 1
+Gold B = APNI = 2
+Gold direction = +1
+```
+
+### 9.12 Predicted counterfactual direction
+
+Calculate model-prediction direction using the same rule:
+
+```text
+predicted_direction =
+sign(predicted_register_X - predicted_register_A)
+```
+
+Example:
+
+```text
+Prediction A = TUMI = 1
+Prediction B = TUMI = 1
+Predicted direction = 0
+```
+
+If the gold direction is `+1` but the model direction is `0`, the model
+ignored the required upward change.
+
+A controlled pair with an invalid prediction has no valid predicted direction
+and is counted as counterfactually inconsistent.
+
+### 9.13 Directional counterfactual consistency
+
+Directional counterfactual consistency measures whether the model changes or
+preserves its prediction in the same direction as the gold primary labels.
+
+A pair is directionally consistent when:
+
+```text
+predicted_direction = gold_direction
+```
+
+Formula:
+
+```text
+Directional counterfactual consistency =
+Number of pairs with matching predicted and gold directions
+÷
+Number of evaluated controlled pairs
+```
+
+This metric is reported overall and separately for:
+
+- Authority changes.
+- Age changes.
+- Familiarity changes.
+- Setting changes.
+
+Directional consistency alone does not prove that both individual
+predictions are correct.
+
+### 9.14 Strict counterfactual consistency
+
+A controlled pair is strictly counterfactually consistent only when:
+
+1. Prediction A belongs to acceptable set A.
+2. Prediction X belongs to acceptable set X.
+3. Predicted direction matches gold primary direction.
+
+Formula:
+
+```text
+Strict counterfactual consistency =
+Number of controlled pairs satisfying all three conditions
+÷
+Number of evaluated controlled pairs
+```
+
+Strict counterfactual consistency is the main pair-level counterfactual metric.
+
+It prevents a model from receiving full credit merely for moving in the
+correct direction while predicting incorrect registers.
+
+### 9.15 Preserve and change cases
+
+Controlled comparisons will be divided into:
+
+#### Preserve cases
+
+The gold primary register remains the same:
+
+```text
+gold_direction = 0
+```
+
+The model should preserve an appropriate register.
+
+#### Change cases
+
+The gold primary register changes:
+
+```text
+gold_direction = -1 or +1
+```
+
+The model should respond in the correct direction.
+
+Report separately:
+
+- Preserve-case consistency.
+- Change-case direction consistency.
+- Strict consistency for preserve cases.
+- Strict consistency for change cases.
+
+This prevents a model that never changes its prediction from appearing
+consistent merely because many gold labels remain unchanged.
+
+### 9.16 Over-politeness and under-politeness
+
+The acceptable register set will be used to classify directional errors.
+
+Let:
+
+```text
+TUI = 0
+TUMI = 1
+APNI = 2
+```
+
+A prediction is over-polite when:
+
+```text
+Predicted level > highest level in the acceptable set
+```
+
+A prediction is under-polite when:
+
+```text
+Predicted level < lowest level in the acceptable set
+```
+
+A prediction is acceptable when:
+
+```text
+Predicted level belongs to the acceptable set
+```
+
+Example:
+
+```text
+Acceptable set = [TUI, TUMI]
+Prediction = APNI
+Classification = OVER_POLITE
+```
+
+Example:
+
+```text
+Acceptable set = [APNI]
+Prediction = TUI
+Classification = UNDER_POLITE
+```
+
+Formulas:
+
+```text
+Over-politeness rate =
+Number of over-polite predictions
+÷
+Number of evaluated instances
+```
+
+```text
+Under-politeness rate =
+Number of under-polite predictions
+÷
+Number of evaluated instances
+```
+
+### 9.17 Counterfactual error categories
+
+Each failed controlled comparison may receive one or more diagnostic codes:
+
+| Code | Meaning |
+|---|---|
+| `IGNORED_CUE` | Gold register changes, but model prediction does not |
+| `OPPOSITE_DIRECTION` | Model changes in the opposite direction |
+| `UNNECESSARY_CHANGE` | Gold register remains stable, but model changes |
+| `OVER_POLITE` | Prediction is above every acceptable register |
+| `UNDER_POLITE` | Prediction is below every acceptable register |
+| `SOURCE_COPY` | Prediction appears to copy source register despite conflicting context |
+| `INVALID_OUTPUT` | One or both pair outputs are invalid |
+| `PAIR_CORRECT` | Both outputs are acceptable and direction is correct |
+
+These diagnostic codes support qualitative error analysis.
+
+They are not replacements for the quantitative metrics.
+
+### 9.18 Source-register copying
+
+Source-copy behavior will be measured because the original message may already
+contain a Tui, Tumi or Apni form.
+
+Formula:
+
+```text
+Source-copy rate =
+Number of predictions equal to source_register
+÷
+Number of instances with source_register in [TUI, TUMI, APNI]
+```
+
+Also report source copying when:
+
+```text
+source_register is not in the gold acceptable set
+```
+
+This identifies cases where a model follows the existing wording despite
+conflicting social context.
+
+`MIXED` and `UNCLEAR` source-register cases will be excluded from the simple
+source-copy-rate denominator and reported separately.
+
+### 9.19 Performance by subgroup
+
+Core metrics will be reported separately by:
+
+- Model.
+- Prompt condition.
+- Gold primary register.
+- Changed-cue type.
+- Domain.
+- Communicative intention.
+- Source register.
+- Code-mixing level.
+- Annotation confidence.
+- Whether a secondary label exists.
+
+Subgroup results with very small sample sizes must be interpreted cautiously.
+
+The number of evaluated cases must be displayed with every subgroup result.
+
+### 9.20 Model-reported confidence
+
+Model-reported confidence values are:
+
+- Low
+- Medium
+- High
+
+Report:
+
+- Number of low-confidence predictions.
+- Number of medium-confidence predictions.
+- Number of high-confidence predictions.
+- Accuracy within each confidence group.
+- Invalid-output rate by confidence when applicable.
+
+Model-reported confidence must not be treated as a verified probability.
+
+A confidence-calibration analysis is optional and must be clearly identified
+as secondary or exploratory unless a numerical probability is requested from
+all models.
+
+### 9.21 Cost, token and latency metrics
+
+For every successful API request, record when available:
+
+- Input tokens.
+- Output tokens.
+- Total tokens.
+- Request latency.
+- Estimated cost.
+- Provider.
+- Model.
+- Prompt condition.
+- Retry count.
+
+Report:
+
+```text
+Total cost per model
+Average cost per response
+Average latency per response
+Total tokens
+Invalid outputs
+Permitted retries
+```
+
+Cost and latency are secondary implementation metrics.
+
+A more expensive model should not automatically be described as scientifically
+better.
+
+### 9.22 Family-level aggregation
+
+Because three instances belong to each family, instance-level results are not
+fully independent.
+
+In addition to overall instance metrics, calculate family-level accuracy:
+
+```text
+Family accuracy =
+Number of acceptable predictions in one family
+÷ 3
+```
+
+Then report the average family accuracy across test families.
+
+Confidence intervals and statistical resampling will operate at the family
+level rather than treating all 360 instances as independent observations.
+
+### 9.23 Development versus test reporting
+
+Development and test metrics must never be merged into one accuracy result.
+
+Report separately:
+
+- Development performance.
+- Test performance.
+- Prompt-development trials.
+- Stability checks.
+- Technical dry runs.
+- Final frozen experiment.
+
+The 810 final-configuration development responses are not part of the 3,240
+frozen test responses.
+
+### 9.24 Rounding and denominators
+
+Every reported metric must include:
+
+- Numerator.
+- Denominator.
+- Decimal value or percentage.
+- Number of invalid outputs.
+
+Recommended display:
+
+```text
+Acceptable-set accuracy:
+287 / 360 = 0.7972 = 79.72%
+```
+
+Keep full numerical precision in saved analysis files.
+
+Round only for tables and written reporting.
+
+Do not report a percentage without reporting its denominator.
+
+### 9.25 Research-question mapping
+
+| Research question | Primary evidence |
+|---|---|
+| RQ1: How accurately do models select Tui, Tumi and Apni? | Acceptable-set accuracy, primary accuracy and macro-F1 |
+| RQ2: Which social cues affect model decisions? | Cue-level strict counterfactual consistency and error categories |
+| RQ3: Does structured context improve performance? | Paired comparison of P0, P1 and P2 |
+| RQ4: Do models over-select or under-select registers? | Over-politeness, under-politeness and confusion matrices |
+| RQ5: Does the BanglaMate pipeline improve rewriting? | Defined separately in the extension evaluation |
+
+### 9.26 Primary and secondary metric declaration
+
+Primary core metrics are:
+
+1. Acceptable-set accuracy.
+2. Macro-F1 using primary labels.
+3. Strict counterfactual consistency.
+
+Supporting core metrics are:
+
+- Primary-label accuracy.
+- Per-class precision, recall and F1.
+- Directional counterfactual consistency.
+- Pairwise acceptable accuracy.
+- Preserve-case consistency.
+- Change-case consistency.
+- Over-politeness rate.
+- Under-politeness rate.
+- Source-copy rate.
+- Invalid-output rate.
+
+Implementation metrics are:
+
+- API cost.
+- Token use.
+- Latency.
+- Retry count.
+
+The thesis must not change this classification after viewing test results.
+
+### 9.27 Metric-validation requirement
+
+Before scoring real model outputs, metric functions must be tested using
+small manually verified examples.
+
+Tests must cover:
+
+- Exact primary match.
+- Secondary acceptable match.
+- Over-politeness.
+- Under-politeness.
+- Invalid output.
+- Gold register preservation.
+- Correct upward change.
+- Correct downward change.
+- Ignored cue.
+- Opposite-direction change.
+- Unnecessary change.
+- Source-register copying.
+
+The expected answer for every test case must be written before running the
+metric implementation.
+
+### 9.28 Metric freeze conditions
+
+Core metrics are frozen only when:
+
+- Every primary metric has an operational definition.
+- Acceptable-set behavior is defined.
+- Invalid-output treatment is defined.
+- Register ordering is frozen.
+- Controlled-pair calculations are defined.
+- Preserve and change cases are separated.
+- Over-politeness and under-politeness are defined.
+- Source-register copying is defined.
+- Subgroup reporting fields are listed.
+- Development and test reporting are separated.
+- Required metric unit tests are specified.
+- Research questions are mapped to evidence.
+
+After metric freeze, any additional metric must be labelled secondary or
+exploratory unless added through an approved protocol amendment.
