@@ -1,0 +1,2 @@
+date,tool_model,task,generated_artifact,human_checks,changes_made,final_decision
+2026-08-30,"OpenAI ChatGPT/Codex - model identifier not displayed","Generate 30 pilot message candidates across six domains","docs/pilot/AI_CANDIDATES_RAW_v0.1.md","Not yet performed; raw output archived unchanged","None","Candidate pool only; not validated research data"
