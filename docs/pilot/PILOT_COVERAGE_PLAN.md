@@ -43,7 +43,7 @@ For every family:
 9. Do not assign annotator gold labels during candidate generation.
 10. Any designer-predicted label must remain private and must not be shown to annotators.
 11. Awkward, stereotyped, unsafe, or culturally implausible AI suggestions must be rewritten or rejected.
-12. All AI assistance must be recorded in `docs/AI_USE_LOG.csv`.
+12. All AI assistance must be recorded in `AI_USE_LOG.csv`.
 
 ## 4. Domain allocation
 
