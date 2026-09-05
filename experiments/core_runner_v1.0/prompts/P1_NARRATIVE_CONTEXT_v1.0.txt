@@ -1,0 +1,11 @@
+Task: Select the most socially appropriate target Bengali second-person register for this Romanized Bangla message and social context.
+
+Context: [[narrative_context]]
+
+Message: [[romanized_message]]
+
+Return exactly one JSON object with this structure:
+{"register":"TUI|TUMI|APNI","confidence":"LOW|MEDIUM|HIGH","reason_codes":["AUTHORITY|AGE|FAMILIARITY|SETTING|KINSHIP|EMOTIONAL_STANCE|OTHER"]}
+
+Replace the alternatives with one register, one confidence value, and only applicable short reason codes. Return no other text.
+

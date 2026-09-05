@@ -1,0 +1,22 @@
+{
+  "freeze_id": "SOCIALCUE-BN-STEP1-V1.0",
+  "frozen_date": "2026-09-02",
+  "dataset_version": "SOCIALCUE-BN-GOLD-V1.0",
+  "prompt_version": "CORE-PROMPTS-V1.0",
+  "instances": 450,
+  "families": 150,
+  "development_instances": 90,
+  "test_instances": 360,
+  "conditions": [
+    "P0_MESSAGE_ONLY",
+    "P1_NARRATIVE_CONTEXT",
+    "P2_STRUCTURED_CONTEXT"
+  ],
+  "p2_development_demonstration_ids": [
+    "F017-A",
+    "F007-A",
+    "F002-C"
+  ],
+  "file_manifest": "freeze/FILE_SHA256.csv",
+  "file_manifest_sha256": "d77c47cff3a0f87af49d3ecc75304dcceb8b04efc0fe28eed3d47e0b00952cb0"
+}

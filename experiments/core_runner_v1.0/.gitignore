@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.py[cod]
+results/raw/*.jsonl
+results/analysis/*.json
+results/analysis/*.csv
+

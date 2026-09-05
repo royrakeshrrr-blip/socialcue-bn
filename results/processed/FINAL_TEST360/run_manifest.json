@@ -1,0 +1,48 @@
+{
+  "conditions": [
+    "P0_MESSAGE_ONLY",
+    "P1_NARRATIVE_CONTEXT",
+    "P2_STRUCTURED_CONTEXT"
+  ],
+  "config_sha256_values": [
+    "9571933536d382d071ada8f74f96c842b9f465a2613dbd443fd12d2c5913e90c"
+  ],
+  "dataset_path": "C:\\Users\\WALTON\\Downloads\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\data\\socialcue_bn_gold_v1.0.csv",
+  "dataset_sha256": "d6d34dbe3b62ef6ca458a2b7e0b4c53614ec59a40c6f69a9a54330492f33e58b",
+  "generated_at_utc": "2026-09-05T03:33:15.787045Z",
+  "input_files": {
+    "gemini_3_5_flash_lite": {
+      "path": "C:\\Users\\WALTON\\Downloads\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\results\\raw\\test_gemini_3_5_flash_lite.jsonl",
+      "sha256": "0685efc60b9ff34bf054bcdf497ec1f19f22246725b628937fd9820cd6f6def4"
+    },
+    "groq_gpt_oss_120b": {
+      "path": "C:\\Users\\WALTON\\Downloads\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\results\\raw\\test_groq_gpt_oss_120b.jsonl",
+      "sha256": "9ce27302271cf99383a8c22dcc1ab62f5f98c35d5400312798f26dbbbb3ba7ce"
+    },
+    "groq_qwen_3_8_27b": {
+      "path": "C:\\Users\\WALTON\\Downloads\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\SocialCue-BN_Step2_Experiment_Runner_v1.0\\results\\raw\\test_groq_qwen_3_8_27b.jsonl",
+      "sha256": "4b5419b2fd2e4129bc0c76fabebfcd76d09b4338aa303d516a69ad97d7dd0ff3"
+    }
+  },
+  "instances_per_model": 360,
+  "label": "FINAL_TEST360",
+  "models": [
+    "gemini_3_5_flash_lite",
+    "groq_gpt_oss_120b",
+    "groq_qwen_3_8_27b"
+  ],
+  "parse_status_counts": {
+    "invalid_json": 1,
+    "recoverable_format": 52,
+    "valid": 3187
+  },
+  "prompt_versions": [
+    "CORE-PROMPTS-V1.0"
+  ],
+  "report_schema": "SOCIALCUE-CORE-REPORT-V1.0",
+  "selected_instance_ids_sha256": "59bc3a23577c57b2a7d44d88e821c06b4535f6099534dc049283735a659ce705",
+  "split": "TEST",
+  "status": "FINAL",
+  "total_records": 3240,
+  "validation_warnings": []
+}

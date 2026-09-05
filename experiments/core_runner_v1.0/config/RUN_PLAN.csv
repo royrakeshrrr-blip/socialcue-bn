@@ -1,0 +1,10 @@
+stage,split,model_key,instances,conditions,expected_calls,test_access,action
+DRY_RUN,DEVELOPMENT,gemini_3_5_flash_lite,10,3,30,LOCKED,Run now
+DRY_RUN,DEVELOPMENT,groq_gpt_oss_120b,10,3,30,LOCKED,Run now
+DRY_RUN,DEVELOPMENT,groq_qwen_3_8_27b,10,3,30,LOCKED,Run now
+FULL_DEVELOPMENT,DEVELOPMENT,gemini_3_5_flash_lite,90,3,270,LOCKED,Resume after dry-run review
+FULL_DEVELOPMENT,DEVELOPMENT,groq_gpt_oss_120b,90,3,270,LOCKED,Resume after dry-run review
+FULL_DEVELOPMENT,DEVELOPMENT,groq_qwen_3_8_27b,90,3,270,LOCKED,Resume after dry-run review
+FINAL_TEST,TEST,gemini_3_5_flash_lite,360,3,1080,EXPLICIT_UNLOCK,Run once after final freeze
+FINAL_TEST,TEST,groq_gpt_oss_120b,360,3,1080,EXPLICIT_UNLOCK,Run once after final freeze
+FINAL_TEST,TEST,groq_qwen_3_8_27b,360,3,1080,EXPLICIT_UNLOCK,Run once after final freeze

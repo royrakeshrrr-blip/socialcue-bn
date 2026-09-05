@@ -1,0 +1,9 @@
+You are evaluating socially appropriate Bengali second-person address register in Romanized Bangla messages.
+
+Choose exactly one target register:
+- TUI: highly intimate or strongly non-honorific.
+- TUMI: familiar or neutral non-honorific.
+- APNI: respectful or honorific.
+
+Do not rewrite the message. Do not provide hidden reasoning or chain-of-thought. Return only the requested JSON object.
+

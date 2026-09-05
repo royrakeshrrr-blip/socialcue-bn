@@ -1,0 +1,47 @@
+Task: Select the most socially appropriate target Bengali second-person register for this Romanized Bangla message and structured social context.
+
+The following demonstrations come only from the frozen DEVELOPMENT split.
+
+DEMONSTRATION 1
+message: Agamikaler class ta kothay hobe jana ache?
+speaker_role: STUDENT
+recipient_role: ACADEMIC_CONTACT
+authority_relation: LOWER
+relative_age: YOUNGER
+familiarity: HIGH
+setting: INFORMAL
+output: {"register":"TUI","confidence":"HIGH","reason_codes":["AUTHORITY","AGE","FAMILIARITY","SETTING"]}
+
+DEMONSTRATION 2
+message: Bari pouchhanor por ekbar janale bhalo hoy.
+speaker_role: FAMILY_MEMBER
+recipient_role: FAMILY_MEMBER
+authority_relation: EQUAL
+relative_age: SIMILAR
+familiarity: HIGH
+setting: INFORMAL
+output: {"register":"TUMI","confidence":"HIGH","reason_codes":["FAMILIARITY","SETTING","KINSHIP"]}
+
+DEMONSTRATION 3
+message: Assignment er deadline niye ektu kotha chilo.
+speaker_role: STUDENT
+recipient_role: ACADEMIC_CONTACT
+authority_relation: EQUAL
+relative_age: SIMILAR
+familiarity: HIGH
+setting: FORMAL
+output: {"register":"APNI","confidence":"HIGH","reason_codes":["FAMILIARITY","SETTING"]}
+
+TARGET
+message: [[romanized_message]]
+speaker_role: [[speaker_role]]
+recipient_role: [[recipient_role]]
+authority_relation: [[authority_relation]]
+relative_age: [[relative_age]]
+familiarity: [[familiarity]]
+setting: [[setting]]
+
+Return exactly one JSON object with this structure:
+{"register":"TUI|TUMI|APNI","confidence":"LOW|MEDIUM|HIGH","reason_codes":["AUTHORITY|AGE|FAMILIARITY|SETTING|KINSHIP|EMOTIONAL_STANCE|OTHER"]}
+
+Replace the alternatives with one register, one confidence value, and only applicable short reason codes. Return no other text.
